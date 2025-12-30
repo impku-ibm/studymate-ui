@@ -1,9 +1,41 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import api from "../api/axios";
 
 export default function Login() {
   const navigate = useNavigate();
-  const [isRegister, setIsRegister] = useState(false);
+  const [form, setForm] = useState({ email: "", password: "" });
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = e =>
+    setForm({ ...form, [e.target.name]: e.target.value });
+
+  const handleLogin = async () => {
+    setLoading(true);
+    try {
+      // 1️⃣ Login
+      const loginRes = await api.post("/auth/login", form);
+
+      const token = loginRes.data.token;
+      const refreshToke = loginRes.data.refreshToken;
+      localStorage.setItem("token", token);
+      localStorage.setItem("refreshToken",refreshToke);
+
+      // 2️⃣ Fetch school details
+      const schoolRes = await api.get("/school"); // token auto-attached
+      localStorage.setItem(
+        "school",
+        JSON.stringify(schoolRes.data)
+      );
+
+      // 3️⃣ Navigate
+      navigate("/admin");
+    } catch (err) {
+      alert("Invalid credentials");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
@@ -11,67 +43,30 @@ export default function Login() {
         <h1 className="text-center text-2xl font-bold text-indigo-600">
           STUDYMATE
         </h1>
-
-        <h2 className="text-center mt-2 text-gray-700">
-          {isRegister ? "Create Account" : "Login"}
-        </h2>
-
-        {isRegister && (
-          <input
-            className="w-full mt-6 p-2 border rounded"
-            placeholder="Full Name"
-          />
-        )}
-
+<form autoComplete="off">
         <input
-          className="w-full mt-4 p-2 border rounded"
+          name="email"
           placeholder="Email"
+          onChange={handleChange}
+          className="w-full mt-6 p-2 border rounded"
         />
 
         <input
+          name="password"
           type="password"
-          className="w-full mt-4 p-2 border rounded"
           placeholder="Password"
+          onChange={handleChange}
+          className="w-full mt-4 p-2 border rounded"
         />
-
-        {isRegister && (
-          <input
-            type="password"
-            className="w-full mt-4 p-2 border rounded"
-            placeholder="Confirm Password"
-          />
-        )}
 
         <button
-          onClick={() => navigate("/admin")}
-          className="w-full mt-6 bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700"
+          onClick={handleLogin}
+          disabled={loading}
+          className="w-full mt-6 bg-indigo-600 text-white py-2 rounded disabled:opacity-50"
         >
-          {isRegister ? "Register" : "Login"}
+          {loading ? "Signing in..." : "Login"}
         </button>
-
-        <p className="text-center text-sm text-gray-500 mt-4">
-          {isRegister ? (
-            <>
-              Already have an account?{" "}
-              <span
-                onClick={() => setIsRegister(false)}
-                className="text-indigo-600 cursor-pointer hover:underline"
-              >
-                Login
-              </span>
-            </>
-          ) : (
-            <>
-              First time here?{" "}
-              <span
-                onClick={() => setIsRegister(true)}
-                className="text-indigo-600 cursor-pointer hover:underline"
-              >
-                Create account
-              </span>
-            </>
-          )}
-        </p>
+        </form>
       </div>
     </div>
   );
