@@ -1,16 +1,121 @@
-# React + Vite
+# School Management System – Admin UI
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This repository contains the **Admin UI (Frontend)** for the School Management System.  
+The UI is built **backend-first**, strictly aligned with already implemented backend APIs, without redesigning or reworking backend logic.
 
-Currently, two official plugins are available:
+The goal is to provide a **clean, ERP-style interface** for managing school master data.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## 🛠 Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **React** (Functional Components + Hooks)
+- **Axios** – REST API communication
+- **Tailwind CSS** – Styling & layout
+- **JWT-based Authentication** (handled by backend)
+- **RESTful APIs**
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 🎯 Scope of This UI (Current Phase)
+
+This UI currently focuses on **School Master Data Setup**, which acts as the foundation for all academic and operational modules.
+
+---
+
+## ✅ Modules Implemented So Far
+
+### 1️⃣ Academic Year Management
+- Create Academic Year
+- Automatically enforces **only one ACTIVE academic year**
+- List all academic years
+- Status badges (ACTIVE / INACTIVE)
+- Activate academic year via API
+
+**APIs Used**
+
+---
+
+### 2️⃣ Class Management
+- Fetch and list classes
+- Class selection acts as a **context selector** for Sections and Subjects
+
+**APIs Used**
+
+---
+
+### 3️⃣ Section Management
+- Sections are always managed **within a selected class**
+- First class is auto-selected on page load
+- Sections auto-load when class changes
+- Create section via modal
+- Immediate refresh after creation
+
+**APIs Used**
+
+---
+
+### 4️⃣ Subject Management
+- Subjects are managed under **Class + Academic Year**
+- Subject creation and listing integrated with existing backend APIs
+- Same UI pattern as Sections
+- No backend rework or duplication
+
+**APIs Used**
+
+---
+
+## 🧠 UX & Design Decisions
+
+- **Context-first UI**
+  - Sections are never shown without a Class
+  - Subjects are never shown without Class / Academic Year
+- **No empty screens**
+  - Default class auto-selected
+  - Data loads automatically on page load
+- **ERP-style design**
+  - Tables for listing data
+  - Modals for create actions
+- **Minimal user actions**
+- **Backend is the single source of truth**
+
+---
+
+## 🔄 Data Hierarchy Followed
+
+
+Each UI screen strictly respects this hierarchy.
+
+---
+
+## 📁 Project Structure (Simplified)
+
+src/
+├── api/
+│ └── axios.js
+├── components/
+│ ├── academicYear/
+│ │ ├── AcademicYearTable.jsx
+│ │ └── AddAcademicYearModal.jsx
+│ ├── class/
+│ │ └── ClassSetup.jsx
+│ ├── section/
+│ │ ├── SectionSetup.jsx
+│ │ └── AddSectionModal.jsx
+│ └── subject/
+│ ├── SubjectSetup.jsx
+│ └── AddSubjectModal.jsx
+├── pages/
+│ └── SchoolSetup.jsx
+└── App.jsx
+
+
+---
+
+## ⚙️ Setup & Run Instructions
+
+### 1️⃣ Install dependencies
+```bash
+npm install
+npm run dev
+npm start
