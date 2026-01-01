@@ -5,108 +5,183 @@ import EnrollStudentModal from "./EnrollStudentModal";
 export default function StudentEnrollment() {
   const [enrollments, setEnrollments] = useState([]);
   const [showEnroll, setShowEnroll] = useState(false);
-  const [reload, setReload] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const refresh = () => setReload(prev => !prev);
+  const loadEnrollments = async () => {
+    setLoading(true);
+    try {
+      const res = await api.get("/enrollments");
+      setEnrollments(res.data);
+    } catch (err) {
+      console.error("Failed to load enrollments", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  // Load enrollments
   useEffect(() => {
-    const load = async () => {
-      try {
-        const res = await api.get("/enrollments");
-        setEnrollments(res.data);
-      } catch (err) {
-        console.error("Failed to load enrollments", err);
-      }
-    };
-    load();
-  }, [reload]);
+    loadEnrollments();
+  }, []);
 
   return (
-    <>
-      {/* Filter / Action Bar */}
-      <div className="bg-white rounded-lg shadow border p-4 mb-6 flex items-center gap-4">
-        <span className="text-sm text-gray-600 font-medium">
-          Academic Year: <span className="text-blue-600">2024-25</span>
+    <div className="space-y-6">
+
+      {/* ---------- Action / Filter Bar ---------- */}
+      <div className="flex items-center gap-4">
+        <span className="text-sm text-slate-600 font-medium">
+          Academic Year:
+          <span className="ml-1 text-blue-600">2024–25</span>
         </span>
 
         {/* Filters (future-ready) */}
-        <select className="ml-auto p-2 border rounded text-sm">
+        <select className="ml-auto px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white">
           <option>Class</option>
         </select>
 
-        <select className="p-2 border rounded text-sm">
+        <select className="px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white">
           <option>Section</option>
         </select>
 
         <button
           onClick={() => setShowEnroll(true)}
-          className="ml-2 px-4 py-2 bg-blue-600 text-white rounded shadow"
+          className="px-4 py-2 bg-blue-600 text-white text-sm
+                     rounded-lg hover:bg-blue-500 transition shadow-sm"
         >
           + Enroll Student
         </button>
       </div>
 
-      {/* Enrollment Table */}
-      <div className="bg-white rounded-lg shadow border">
-        <table className="w-full text-sm">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-4 py-3 text-left">Roll No</th>
-              <th className="px-4 py-3 text-left">Student Name</th>
-              <th className="px-4 py-3 text-left">Admission No</th>
-              <th className="px-4 py-3 text-left">Class</th>
-              <th className="px-4 py-3 text-left">Section</th>
-              <th className="px-4 py-3 text-left">Status</th>
-              <th className="px-4 py-3 text-left">Actions</th>
-            </tr>
-          </thead>
+      {/* ---------- Table Card ---------- */}
+      <div
+        className="bg-white rounded-xl border border-slate-200 shadow-sm
+                   flex flex-col h-[calc(100vh-320px)]"
+      >
 
-          <tbody>
-            {enrollments.length === 0 ? (
+        {/* ---------- Scrollable Table ---------- */}
+        <div className="flex-1 overflow-y-auto">
+
+          <table className="w-full text-sm">
+            <thead className="bg-slate-50 border-b sticky top-0 z-10">
               <tr>
-                <td
-                  colSpan="7"
-                  className="px-4 py-6 text-center text-gray-500"
-                >
-                  No enrollments found
-                </td>
+                <th className="px-6 py-3 text-left text-xs uppercase text-slate-500">
+                  Roll No
+                </th>
+                <th className="px-6 py-3 text-left text-xs uppercase text-slate-500">
+                  Student Name
+                </th>
+                <th className="px-6 py-3 text-left text-xs uppercase text-slate-500">
+                  Admission No
+                </th>
+                <th className="px-6 py-3 text-left text-xs uppercase text-slate-500">
+                  Class
+                </th>
+                <th className="px-6 py-3 text-left text-xs uppercase text-slate-500">
+                  Section
+                </th>
+                <th className="px-6 py-3 text-left text-xs uppercase text-slate-500">
+                  Status
+                </th>
+                <th className="px-6 py-3 text-right text-xs uppercase text-slate-500">
+                  Actions
+                </th>
               </tr>
-            ) : (
-              enrollments.map(e => (
-                <tr key={e.id} className="border-t">
-                  <td className="px-4 py-3">{e.rollNumber}</td>
-                  <td className="px-4 py-3">{e.student.fullName}</td>
-                  <td className="px-4 py-3">{e.student.admissionNumber}</td>
-                  <td className="px-4 py-3">{e.schoolClass.name}</td>
-                  <td className="px-4 py-3">{e.section.name}</td>
-                  <td className="px-4 py-3">
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs ${
-                        e.status === "ACTIVE"
-                          ? "bg-green-100 text-green-700"
-                          : "bg-gray-200 text-gray-600"
-                      }`}
-                    >
-                      {e.status}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 flex gap-3 text-blue-600">
-                    👁 ✏️ 🚫
+            </thead>
+
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td colSpan="7" className="px-6 py-10 text-center text-slate-500">
+                    Loading enrollments…
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : enrollments.length === 0 ? (
+                <tr>
+                  <td colSpan="7" className="px-6 py-10 text-center text-slate-500">
+                    No enrollments found
+                  </td>
+                </tr>
+              ) : (
+                enrollments.map(e => (
+                  <tr
+                    key={e.id}
+                    className="border-b last:border-none hover:bg-slate-50 transition"
+                  >
+                    <td className="px-6 py-3 text-slate-600">
+                      {e.rollNumber}
+                    </td>
+
+                    <td className="px-6 py-3 font-medium text-slate-800">
+                      {e.studentName}
+                    </td>
+
+                    <td className="px-6 py-3 text-slate-600">
+                      {e.admissionNumber}
+                    </td>
+
+                    <td className="px-6 py-3 text-slate-600">
+                      {e.className}
+                    </td>
+
+                    <td className="px-6 py-3 text-slate-600">
+                      {e.sectionName}
+                    </td>
+
+                    <td className="px-6 py-3">
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-medium ${
+                          e.status === "ACTIVE"
+                            ? "bg-emerald-100 text-emerald-700"
+                            : "bg-slate-200 text-slate-700"
+                        }`}
+                      >
+                        {e.status}
+                      </span>
+                    </td>
+
+                    {/* Actions – INLINE */}
+                    <td className="px-6 py-3 text-right">
+                      <div className="inline-flex items-center gap-3">
+                        <button
+                          title="View Enrollment"
+                          className="text-slate-500 hover:text-blue-600"
+                        >
+                          👁
+                        </button>
+                        <button
+                          title="Edit Enrollment"
+                          className="text-slate-500 hover:text-blue-600"
+                        >
+                          ✏️
+                        </button>
+                        <button
+                          title="Deactivate (future)"
+                          className="text-slate-400 cursor-not-allowed"
+                        >
+                          🚫
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* ---------- Bottom breathing space ---------- */}
+        <div className="h-6" />
       </div>
 
+      {/* ---------- Modal ---------- */}
       {showEnroll && (
         <EnrollStudentModal
           onClose={() => setShowEnroll(false)}
-          onSuccess={refresh}
+          onSuccess={() => {
+            setShowEnroll(false);
+            loadEnrollments();
+          }}
         />
       )}
-    </>
+    </div>
   );
 }

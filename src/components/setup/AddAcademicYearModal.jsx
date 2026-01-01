@@ -19,13 +19,10 @@ export default function AddAcademicYearModal({ onClose, onSuccess }) {
     const startYear = start.getFullYear();
     const endYear = startYear + 1;
 
-    const endDate = `${endYear}-03-31`;
-    const year = `${startYear}-${endYear}`;
-
     setForm(prev => ({
       ...prev,
-      endDate,
-      year
+      endDate: `${endYear}-03-31`,
+      year: `${startYear}-${endYear}`
     }));
   }, [form.startDate]);
 
@@ -34,7 +31,7 @@ export default function AddAcademicYearModal({ onClose, onSuccess }) {
 
   const handleSubmit = async () => {
     if (!form.startDate) {
-      alert("Start Date is required");
+      alert("Start date is required");
       return;
     }
 
@@ -42,12 +39,9 @@ export default function AddAcademicYearModal({ onClose, onSuccess }) {
 
     setLoading(true);
     try {
-      await api.post("/academic-years", {
-        startYear
-      });
-
-      onSuccess(); // refresh list
-      onClose();   // close modal
+      await api.post("/academic-years", { startYear });
+      onSuccess();
+      onClose();
     } catch (err) {
       alert(
         err?.response?.data?.message ||
@@ -60,63 +54,80 @@ export default function AddAcademicYearModal({ onClose, onSuccess }) {
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-      <div className="bg-white w-[520px] rounded-xl shadow-lg">
+      <div className="bg-white w-[560px] rounded-xl shadow-lg">
 
-        {/* Header */}
+        {/* ---------- Header ---------- */}
         <div className="px-6 py-4 border-b">
-          <h3 className="text-lg font-semibold">Add Academic Year</h3>
-          <p className="text-sm text-gray-500 mt-1">
-            Academic year runs from April to March. Only one year can be active at a time.
+          <h3 className="text-lg font-semibold text-slate-900">
+            Add Academic Year
+          </h3>
+          <p className="text-sm text-slate-500 mt-1">
+            An academic year runs from <strong>April to March</strong>.
+            Only one academic year can be active at a time.
           </p>
         </div>
 
-        {/* Form */}
-        <div className="p-6 space-y-4">
+        {/* ---------- Guidance ---------- */}
+        <div className="px-6 py-3 bg-blue-50 text-blue-700 text-sm">
+          Select the <strong>start date</strong>. The system will automatically
+          generate the academic year and end date.
+        </div>
 
-          {/* Academic Year (auto) */}
-          <input
-            value={form.year}
-            disabled
-            placeholder="Academic Year (e.g. 2024-25)"
-            className="w-full border-2 border-gray-300 rounded-lg px-4 py-3
-                       text-sm bg-gray-50 cursor-not-allowed"
-          />
+        {/* ---------- Form ---------- */}
+        <div className="p-6 space-y-5">
 
-          <div className="flex gap-4">
+          {/* Academic Year (auto-generated) */}
+          <div>
+            <label className="block text-xs text-slate-500 mb-1">
+              Academic Year (auto-generated)
+            </label>
+            <input
+              value={form.year}
+              disabled
+              placeholder="e.g. 2024-25"
+              className="w-full border border-slate-300 rounded-lg px-4 py-3
+                         text-sm bg-slate-100 cursor-not-allowed"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+
             {/* Start Date */}
-            <div className="w-1/2">
-              <label className="block text-xs text-gray-500 mb-1">
-                Start Date
+            <div>
+              <label className="block text-xs text-slate-500 mb-1">
+                Start Date *
               </label>
               <input
                 type="date"
                 name="startDate"
                 onChange={handleChange}
-                className="w-full border-2 border-gray-300 rounded-lg px-4 py-3 text-sm"
+                className="w-full border border-slate-300 rounded-lg
+                           px-4 py-3 text-sm"
               />
             </div>
 
             {/* End Date */}
-            <div className="w-1/2">
-              <label className="block text-xs text-gray-500 mb-1">
-                End Date
+            <div>
+              <label className="block text-xs text-slate-500 mb-1">
+                End Date (auto)
               </label>
               <input
                 type="date"
                 value={form.endDate}
                 disabled
-                className="w-full border-2 border-gray-300 rounded-lg px-4 py-3
-                           text-sm bg-gray-50 cursor-not-allowed"
+                className="w-full border border-slate-300 rounded-lg
+                           px-4 py-3 text-sm bg-slate-100 cursor-not-allowed"
               />
             </div>
+
           </div>
         </div>
 
-        {/* Footer */}
+        {/* ---------- Footer ---------- */}
         <div className="px-6 py-4 border-t flex justify-end gap-3">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-sm text-gray-600"
+            className="px-4 py-2 text-sm text-slate-600 hover:text-slate-800"
             disabled={loading}
           >
             Cancel
@@ -126,7 +137,7 @@ export default function AddAcademicYearModal({ onClose, onSuccess }) {
             onClick={handleSubmit}
             disabled={loading}
             className="px-5 py-2 text-sm bg-blue-600 text-white rounded-lg
-                       disabled:opacity-50"
+                       hover:bg-blue-500 transition disabled:opacity-50"
           >
             {loading ? "Creating..." : "Create Academic Year"}
           </button>

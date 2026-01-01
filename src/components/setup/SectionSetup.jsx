@@ -9,18 +9,17 @@ export default function SectionSetup() {
   const [showAdd, setShowAdd] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // 🔹 Load classes
+  // Load classes
   useEffect(() => {
-    api.get("/classes").then(res => {setClasses(res.data)
- // ⭐ DEFAULT SELECT FIRST CLASS
-    if (res.data.length > 0) {
-      setSelectedClass(res.data[0].id);
-    }
-  });
-    
+    api.get("/classes").then(res => {
+      setClasses(res.data);
+      if (res.data.length > 0) {
+        setSelectedClass(res.data[0].id);
+      }
+    });
   }, []);
 
-  // 🔹 Load sections when class changes
+  // Load sections when class changes
   useEffect(() => {
     if (!selectedClass) {
       setSections([]);
@@ -35,80 +34,111 @@ export default function SectionSetup() {
   }, [selectedClass]);
 
   return (
-    <div className="p-4">
+    <div className="space-y-4">
 
-      {/* Action Bar */}
-      <div className="flex items-center gap-4 mb-4">
-        <select
-          value={selectedClass}
-          onChange={e => setSelectedClass(e.target.value)}
-          className="p-2 border-2 rounded-lg text-sm w-60"
-        >
-          <option value="">Select Class</option>
-          {classes.map(c => (
-            <option key={c.id} value={c.id}>
-              {c.name}
-            </option>
-          ))}
-        </select>
+      {/* ---------- Action Bar ---------- */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-lg font-semibold text-slate-900">
+            Sections
+          </h3>
+          <p className="text-sm text-slate-500">
+            Manage sections under each class
+          </p>
+        </div>
 
-        <button
-          onClick={() => setShowAdd(true)}
-          className="ml-auto px-4 py-2 bg-blue-600 text-white rounded-lg"
-          disabled={!selectedClass}
-        >
-          + Add Section
-        </button>
-      </div>
-
-      {/* Section Table */}
-      <div className="bg-white rounded-lg shadow border">
-        <table className="w-full text-sm">
-          <thead className="bg-gray-50 border-b">
-            <tr>
-              <th className="px-6 py-3 text-left font-semibold">
-                Section Name
-              </th>
-              <th className="px-6 py-3 text-left font-semibold">
-                Status
-              </th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {loading && (
-              <tr>
-                <td colSpan="2" className="px-6 py-6 text-center">
-                  Loading...
-                </td>
-              </tr>
-            )}
-
-            {!loading && sections.length === 0 && (
-              <tr>
-                <td colSpan="2" className="px-6 py-6 text-center text-gray-500">
-                  No sections found for this class
-                </td>
-              </tr>
-            )}
-
-            {sections.map(s => (
-              <tr key={s.id} className="border-b last:border-none">
-                <td className="px-6 py-4 font-medium">
-                  {s.name}
-                </td>
-                <td className="px-6 py-4">
-                  <span className="px-3 py-1 rounded-full text-xs bg-green-100 text-green-700">
-                    ACTIVE
-                  </span>
-                </td>
-              </tr>
+        <div className="flex items-center gap-3">
+          <select
+            value={selectedClass}
+            onChange={e => setSelectedClass(e.target.value)}
+            className="px-3 py-2 border border-slate-300 rounded-lg
+                       text-sm w-60 bg-white"
+          >
+            <option value="">Select Class</option>
+            {classes.map(c => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
             ))}
-          </tbody>
-        </table>
+          </select>
+
+          <button
+            onClick={() => setShowAdd(true)}
+            disabled={!selectedClass}
+            className="px-4 py-2 bg-blue-600 text-white text-sm
+                       rounded-lg hover:bg-blue-500 transition
+                       disabled:opacity-50"
+          >
+            + Add Section
+          </button>
+        </div>
       </div>
 
-      {/* Add Section Modal */}
+      {/* ---------- Table Card ---------- */}
+      <div className="bg-white rounded-xl border border-slate-200 shadow-sm
+                flex flex-col h-[calc(100vh-335px)] mb-4">
+        {loading ? (
+          <div className="p-6 text-sm text-slate-500">
+            Loading sections…
+          </div>
+        ) : sections.length === 0 ? (
+          <div className="p-12 text-center">
+            <p className="text-slate-500 text-sm">
+              No sections found for this class
+            </p>
+            {selectedClass && (
+              <button
+                onClick={() => setShowAdd(true)}
+                className="mt-4 px-4 py-2 bg-blue-600 text-white
+                           rounded-lg text-sm"
+              >
+                + Add First Section
+              </button>
+            )}
+          </div>
+       ) : (
+ <div className="flex-1 overflow-y-auto">
+    <table className="w-full text-sm">
+      <thead className="bg-slate-50 border-b sticky top-0 z-10">
+
+              <tr>
+                <th className="px-6 py-3 text-left text-xs uppercase
+                               tracking-wide text-slate-500">
+                  Section Name
+                </th>
+                <th className="px-6 py-3 text-left text-xs uppercase
+                               tracking-wide text-slate-500">
+                  Status
+                </th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {sections.map(s => (
+                <tr
+                  key={s.id}
+                  className="border-b last:border-none
+                             hover:bg-slate-50 transition"
+                >
+                  <td className="px-6 py-3 font-medium text-slate-800">
+                    {s.name}
+                  </td>
+
+                  <td className="px-6 py-3">
+                    <span className="px-3 py-1 rounded-full text-xs font-medium
+                                     bg-emerald-100 text-emerald-700">
+                      ACTIVE
+                    </span>
+                  </td>
+                </tr>
+              ))}
+          </tbody>
+    </table>
+  </div>
+)}
+      </div>
+
+      {/* ---------- Modal ---------- */}
       {showAdd && (
         <AddSectionModal
           classId={selectedClass}

@@ -4,19 +4,24 @@ import Topbar from "../components/Topbar";
 
 export default function DashboardLayout() {
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="h-screen flex overflow-hidden bg-slate-100">
+      
       {/* Sidebar */}
       <Sidebar />
 
-      {/* Main content area */}
-      <div className="flex flex-col flex-1">
-        {/* Topbar */}
+      {/* Right Side */}
+      <div className="flex flex-col flex-1 overflow-hidden">
+
+        {/* Topbar (fixed) */}
         <Topbar />
 
-        {/* Page content */}
-        <main className="flex-1 p-6">
-          <Outlet />
-        </main>
+        {/* Main content (scrollable) */}
+        <main className="flex-1 overflow-hidden p-6 h-[calc(100vh-72px)]">
+  <Outlet />
+</main>
+
+
+
       </div>
     </div>
   );

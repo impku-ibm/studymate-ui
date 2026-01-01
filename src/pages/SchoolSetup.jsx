@@ -16,7 +16,14 @@ export default function SchoolSetup() {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-4">School Setup</h2>
+      <div className="mb-6">
+  <h2 className="text-3xl font-bold text-slate-900">
+    School Setup
+  </h2>
+  <p className="text-sm text-slate-500 mt-1">
+    Configure academic structure, classes, subjects and staff
+  </p>
+</div>
 
       <div className="border-b flex gap-6 mb-6">
         {tabs.map(t => (

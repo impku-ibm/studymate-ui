@@ -5,94 +5,172 @@ import api from "../../api/axios";
 export default function StudentDirectory() {
   const [showAdd, setShowAdd] = useState(false);
   const [students, setStudents] = useState([]);
-  const [reload, setReload] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const refresh = () => setReload(prev => !prev);
+  const loadStudents = async () => {
+    setLoading(true);
+    try {
+      const res = await api.get("/students");
+      setStudents(res.data);
+    } catch (e) {
+      console.error("Failed to load students", e);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  // 🔹 Fetch students from backend
   useEffect(() => {
-    const loadStudents = async () => {
-      try {
-        const res = await api.get("/students");
-        setStudents(res.data);
-      } catch (err) {
-        console.error("Failed to load students", err);
-      }
-    };
-
     loadStudents();
-  }, [reload]);
+  }, []);
 
   return (
-    <>
-      {/* Action bar */}
-      <div className="flex justify-end mb-4">
+    <div className="space-y-6">
+
+      {/* ---------- Page Header ---------- */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-lg font-semibold text-slate-900">
+            Students
+          </h3>
+          <p className="text-sm text-slate-500">
+            Manage student records and enrollment details
+          </p>
+        </div>
+
         <button
           onClick={() => setShowAdd(true)}
-          className="px-4 py-2 bg-blue-600 text-white rounded shadow"
+          className="px-4 py-2 bg-blue-600 text-white text-sm
+                     rounded-lg hover:bg-blue-500 transition shadow-sm"
         >
           + Add Student
         </button>
       </div>
 
-      {/* Table */}
-      <div className="bg-white rounded-lg shadow border">
-        <table className="w-full text-sm">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-4 py-3 text-left">Admission Number</th>
-              <th className="px-4 py-3 text-left">Student Name</th>
-              <th className="px-4 py-3 text-left">Parent Name</th>
-              <th className="px-4 py-3 text-left">Parent Mobile</th>
-              <th className="px-4 py-3 text-left">Admission Date</th>
-              <th className="px-4 py-3 text-left">Status</th>
-              <th className="px-4 py-3 text-left">Actions</th>
-            </tr>
-          </thead>
+      {/* ---------- Table Card ---------- */}
+      <div
+        className="bg-white rounded-xl border border-slate-200 shadow-sm
+                   flex flex-col h-[calc(100vh-335px)] mb-4"
+      >
 
-          <tbody>
-            {students.length === 0 ? (
+        {/* Scrollable Table Wrapper */}
+        <div className="flex-1 overflow-y-auto">
+
+          <table className="w-full text-sm">
+            <thead className="bg-slate-50 border-b sticky top-0 z-10">
               <tr>
-                <td colSpan="7" className="px-4 py-6 text-center text-gray-500">
-                  No students found
-                </td>
+                <th className="px-6 py-3 text-left text-xs uppercase text-slate-500">
+                  Admission No
+                </th>
+                <th className="px-6 py-3 text-left text-xs uppercase text-slate-500">
+                  Student Name
+                </th>
+                <th className="px-6 py-3 text-left text-xs uppercase text-slate-500">
+                  Parent Name
+                </th>
+                <th className="px-6 py-3 text-left text-xs uppercase text-slate-500">
+                  Parent Mobile
+                </th>
+                <th className="px-6 py-3 text-left text-xs uppercase text-slate-500">
+                  Admission Date
+                </th>
+                <th className="px-6 py-3 text-left text-xs uppercase text-slate-500">
+                  Status
+                </th>
+                <th className="px-6 py-3 text-right text-xs uppercase text-slate-500">
+                  Actions
+                </th>
               </tr>
-            ) : (
-              students.map(s => (
-                <tr key={s.admissionNumber} className="border-t">
-                  <td className="px-4 py-3">{s.admissionNumber}</td>
-                  <td className="px-4 py-3">{s.fullName}</td>
-                  <td className="px-4 py-3">{s.parentName}</td>
-                  <td className="px-4 py-3">{s.parentMobile}</td>
-                  <td className="px-4 py-3">{s.admissionDate}</td>
-                  <td className="px-4 py-3">
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs ${
-                        s.status === "ACTIVE"
-                          ? "bg-green-100 text-green-700"
-                          : "bg-gray-200 text-gray-600"
-                      }`}
-                    >
-                      {s.status}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 flex gap-3 text-blue-600">
-                    👁 ✏️
+            </thead>
+
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td colSpan="7" className="px-6 py-10 text-center text-slate-500">
+                    Loading students…
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : students.length === 0 ? (
+                <tr>
+                  <td colSpan="7" className="px-6 py-10 text-center text-slate-500">
+                    No students found
+                  </td>
+                </tr>
+              ) : (
+                students.map(s => (
+                  <tr
+                    key={s.admissionNumber}
+                    className="border-b last:border-none hover:bg-slate-50 transition"
+                  >
+                    <td className="px-6 py-3 text-slate-600">
+                      {s.admissionNumber}
+                    </td>
+
+                    <td className="px-6 py-3 font-medium text-slate-800">
+                      {s.fullName}
+                    </td>
+
+                    <td className="px-6 py-3 text-slate-600">
+                      {s.parentName}
+                    </td>
+
+                    <td className="px-6 py-3 text-slate-600">
+                      {s.parentMobile}
+                    </td>
+
+                    <td className="px-6 py-3 text-slate-600">
+                      {s.admissionDate}
+                    </td>
+
+                    <td className="px-6 py-3">
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-medium ${
+                          s.status === "ACTIVE"
+                            ? "bg-emerald-100 text-emerald-700"
+                            : "bg-slate-200 text-slate-700"
+                        }`}
+                      >
+                        {s.status}
+                      </span>
+                    </td>
+
+                    {/* Actions – INLINE like Teacher */}
+                    <td className="px-6 py-4 text-right">
+                      <div className="inline-flex items-center gap-3">
+                        <button
+                          title="View Student"
+                          className="text-slate-500 hover:text-blue-600"
+                        >
+                          👁
+                        </button>
+                        <button
+                          title="Edit Student"
+                          className="text-slate-500 hover:text-blue-600"
+                        >
+                          ✏️
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* ---------- Bottom Padding (IMPORTANT) ---------- */}
+        <div className="h-6" />
       </div>
 
-      {/* Modal */}
+      {/* ---------- Modal ---------- */}
       {showAdd && (
         <AddStudentModal
           onClose={() => setShowAdd(false)}
-          onSuccess={refresh}
+          onSuccess={() => {
+            setShowAdd(false);
+            loadStudents();
+          }}
         />
       )}
-    </>
+    </div>
   );
 }

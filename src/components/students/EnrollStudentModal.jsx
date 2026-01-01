@@ -66,7 +66,7 @@ export default function EnrollStudentModal({ onClose, onSuccess }) {
         <div className="px-6 py-4 border-b">
           <h3 className="text-lg font-semibold">Enroll Student</h3>
           <p className="text-sm text-gray-500">
-            Academic Year: {academicYear?.name}
+            Academic Year: {academicYear?.year}
           </p>
         </div>
 

@@ -9,6 +9,7 @@ import SchoolOnboarding from "./pages/SchoolOnboarding";
 import Teachers from "./pages/Teachers";
 import Students from "./pages/Students";
 import ProtectedRoute from './components/ProtectedRoute';
+import Account from "./pages/accounts/Account";
 
 export default function App() {
   return (
@@ -29,6 +30,7 @@ export default function App() {
         <Route path="setup" element={<SchoolSetup />} />
         <Route path="teachers" element={<Teachers />} />
         <Route path="students" element={<Students />} />
+        <Route path="accounts" element={<Account />} />
       </Route>
 
       

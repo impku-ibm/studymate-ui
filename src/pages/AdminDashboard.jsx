@@ -1,34 +1,120 @@
+import { useEffect, useState } from "react";
+import api from "../api/axios";
+
 export default function AdminDashboard() {
+
+  const [summary, setSummary] = useState({
+    totalStudents: 0,
+    totalTeachers: 0,
+    totalClasses: 0,
+    activeAcademicYear: "-",
+    recentActivities: []
+  });
+
+  useEffect(() => {
+    api.get("/dashboard/summary")
+       .then(res => setSummary(res.data));
+  }, []);
+
   return (
-    <>
-      <h2 className="text-2xl font-bold mb-6">Dashboard</h2>
+    <div className="space-y-8">
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-        <Stat title="Total Students" value="1,245" />
-        <Stat title="Total Teachers" value="87" />
-        <Stat title="Total Classes" value="32" />
-        <Stat title="Academic Year" value="2024-25" />
+      {/* Header */}
+      <div>
+        <h2 className="text-3xl font-bold text-slate-900">
+          Dashboard
+        </h2>
+        <p className="text-sm text-slate-500 mt-1">
+          Overview of your school’s academic & administrative data
+        </p>
       </div>
 
-      <div className="bg-white p-6 rounded shadow">
-        <h3 className="font-semibold mb-4">Recent Activity</h3>
-        <ul className="space-y-2 text-gray-600 text-sm">
-          <li>• New student admission: Rajesh Kumar (Class 10-A)</li>
-          <li>• Teacher assigned: Mrs. Sharma to Class 8-B</li>
-          <li>• Exam scheduled: Mid-term for Class 9</li>
-          <li>• Result published: Class 12 Final Exam</li>
-          <li>• New subject added: Computer Science</li>
-        </ul>
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
+
+        <StatCard
+          title="Total Students"
+          value={summary.totalStudents}
+          gradient="from-blue-600 to-blue-500"
+        />
+
+        <StatCard
+          title="Total Teachers"
+          value={summary.totalTeachers}
+          gradient="from-emerald-600 to-emerald-500"
+        />
+
+        <StatCard
+          title="Total Classes"
+          value={summary.totalClasses}
+          gradient="from-indigo-600 to-indigo-500"
+        />
+
+        <StatCard
+          title="Academic Year"
+          value={summary.activeAcademicYear}
+          gradient="from-purple-600 to-purple-500"
+        />
       </div>
-    </>
+
+      {/* Recent Activity */}
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200">
+        <div className="px-6 py-4 border-b">
+          <h3 className="font-semibold text-slate-800">
+            Recent Activity
+          </h3>
+        </div>
+
+        <div className="p-6">
+          {summary.recentActivities.length === 0 ? (
+            <p className="text-sm text-slate-500">
+              No recent activity
+            </p>
+          ) : (
+            <ul className="space-y-3 text-sm">
+              {summary.recentActivities.map((a, i) => (
+                <li
+                  key={i}
+                  className="flex items-start gap-2 text-slate-700"
+                >
+                  <span className="mt-1 h-2 w-2 rounded-full bg-blue-500" />
+                  {a}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
+
+    </div>
   );
 }
 
-function Stat({ title, value }) {
+/* ----------------- */
+/* Reusable StatCard */
+/* ----------------- */
+
+function StatCard({ title, value, gradient }) {
   return (
-    <div className="bg-white p-4 rounded shadow">
-      <p className="text-sm text-gray-500">{title}</p>
-      <p className="text-2xl font-bold">{value}</p>
+    <div
+      className={`
+        relative overflow-hidden rounded-xl
+        bg-gradient-to-r ${gradient}
+        p-5 text-white shadow-md
+        transition-transform duration-200
+        hover:-translate-y-1
+      `}
+    >
+      <p className="text-sm opacity-90">
+        {title}
+      </p>
+
+      <p className="mt-2 text-3xl font-bold">
+        {value}
+      </p>
+
+      {/* subtle background glow */}
+      <div className="absolute -right-6 -bottom-6 h-24 w-24 rounded-full bg-white/10" />
     </div>
   );
 }

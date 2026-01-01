@@ -17,9 +17,10 @@ export default function Login() {
       const loginRes = await api.post("/auth/login", form);
 
       const token = loginRes.data.token;
-      const refreshToke = loginRes.data.refreshToken;
+      console.log("Token is " , token);
+      const refreshToken = loginRes.data.refreshToken;
       localStorage.setItem("token", token);
-      localStorage.setItem("refreshToken",refreshToke);
+      localStorage.setItem("refreshToken",refreshToken);
 
       // 2️⃣ Fetch school details
       const schoolRes = await api.get("/school"); // token auto-attached

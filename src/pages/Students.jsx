@@ -34,13 +34,6 @@ export default function Students() {
         ))}
       </div>
 
-      {/* Info Banner */}
-      <div className="bg-blue-50 text-blue-700 text-sm px-4 py-2 rounded mb-6">
-        {activeTab === "directory"
-          ? "Student Directory defines WHO the student is, not their yearly class assignment."
-          : "Class Enrollment defines WHERE students study for each academic year."}
-      </div>
-
       {/* Content */}
       {activeTab === "directory" && <StudentDirectory />}
       {activeTab === "enrollment" && <StudentEnrollment />}
