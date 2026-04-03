@@ -55,7 +55,7 @@ export default function Accounts() {
       </div>
 
       {/* ===== Focused Content Area ===== */}
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-auto">
         {activeTab === "structure" && <FeeStructure />}
         {activeTab === "collection" && <FeeCollection />}
         {activeTab === "reports" && <FeeReports />}

@@ -62,3 +62,8 @@ table { min-width: 600px; }
 
 /* Table containers scroll */
 .bg-white.rounded-xl.border { overflow-x: auto; }
+
+/* Ensure data containers are always scrollable */
+[class*="h-[calc(100vh"] {
+  overflow-y: auto !important;
+}
