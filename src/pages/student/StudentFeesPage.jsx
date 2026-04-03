@@ -19,6 +19,7 @@ export default function StudentFeesPage() {
 
   const statusColors = {
     PAID: "bg-emerald-100 text-emerald-700",
+    PARTIAL_PAID: "bg-amber-100 text-amber-700",
     PARTIAL: "bg-amber-100 text-amber-700",
     PENDING: "bg-red-100 text-red-700",
     OVERDUE: "bg-red-200 text-red-800",
@@ -49,10 +50,10 @@ export default function StudentFeesPage() {
               ) : fees.map((f, i) => (
                 <tr key={i} className="border-b hover:bg-slate-50">
                   <td className="px-4 py-3 font-medium">{f.feeType}</td>
-                  <td className="px-4 py-3">₹{f.amount}</td>
+                  <td className="px-4 py-3">₹{f.totalAmount || f.amount}</td>
                   <td className="px-4 py-3">{f.dueDate}</td>
                   <td className="px-4 py-3 text-emerald-600">₹{f.paidAmount || 0}</td>
-                  <td className="px-4 py-3 text-red-600">₹{f.pendingAmount || f.amount}</td>
+                  <td className="px-4 py-3 text-red-600">₹{f.pendingAmount ?? ((f.totalAmount || f.amount || 0) - (f.paidAmount || 0))}</td>
                   <td className="px-4 py-3">
                     <span className={`px-3 py-1 rounded-full text-xs font-medium ${statusColors[f.status] || "bg-slate-100"}`}>
                       {f.status || "PENDING"}
