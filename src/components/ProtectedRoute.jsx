@@ -1,28 +1,31 @@
 import { Navigate } from "react-router-dom";
 
-function isTokenValid() {
+function hasValidSession() {
   const token = localStorage.getItem("token");
-  if (!token) return false;
+  const refreshToken = localStorage.getItem("refreshToken");
 
-  try {
-    // Decode JWT payload (base64)
-    const payload = JSON.parse(atob(token.split(".")[1]));
-    const expiry = payload.exp * 1000; // convert to ms
-    if (Date.now() >= expiry) {
-      // Token expired — clean up
-      localStorage.removeItem("token");
-      localStorage.removeItem("refreshToken");
-      localStorage.removeItem("school");
-      return false;
-    }
-    return true;
-  } catch {
-    // Malformed token
-    localStorage.removeItem("token");
-    return false;
+  // No tokens at all — must login
+  if (!token && !refreshToken) return false;
+
+  // If access token exists and is not expired, we're good
+  if (token) {
+    try {
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      if (Date.now() < payload.exp * 1000) return true;
+    } catch { /* malformed */ }
   }
+
+  // Access token expired but refresh token exists —
+  // let the page render, axios interceptor will silently refresh
+  if (refreshToken) return true;
+
+  // Nothing valid
+  localStorage.removeItem("token");
+  localStorage.removeItem("refreshToken");
+  localStorage.removeItem("school");
+  return false;
 }
 
 export default function ProtectedRoute({ children }) {
-  return isTokenValid() ? children : <Navigate to="/login" replace />;
+  return hasValidSession() ? children : <Navigate to="/login" replace />;
 }
