@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../../api/axios";
 import EnrollStudentModal from "./EnrollStudentModal";
+import { EyeIcon, PencilIcon, BanIcon } from "../common/Icons";
 
 export default function StudentEnrollment() {
   const [enrollments, setEnrollments] = useState([]);
@@ -160,21 +161,21 @@ export default function StudentEnrollment() {
                       <div className="inline-flex items-center gap-3">
                         <button
                           title="View Enrollment"
-                          className="text-slate-500 hover:text-blue-600"
+                          className="text-slate-400 hover:text-blue-600 transition"
                         >
-                          👁
+                          <EyeIcon className="w-[18px] h-[18px]" />
                         </button>
                         <button
                           title="Edit Enrollment"
-                          className="text-slate-500 hover:text-blue-600"
+                          className="text-slate-400 hover:text-blue-600 transition"
                         >
-                          ✏️
+                          <PencilIcon className="w-[18px] h-[18px]" />
                         </button>
                         <button
                           title="Deactivate (future)"
-                          className="text-slate-400 cursor-not-allowed"
+                          className="text-slate-300 cursor-not-allowed"
                         >
-                          🚫
+                          <BanIcon className="w-[18px] h-[18px]" />
                         </button>
                       </div>
                     </td>

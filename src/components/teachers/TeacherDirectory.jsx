@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../../api/axios";
 import AddTeacherModal from "./AddTeacherModal";
+import { PencilIcon, BanIcon } from "../common/Icons";
 
 export default function TeacherDirectory() {
   const [teachers, setTeachers] = useState([]);
@@ -145,16 +146,16 @@ export default function TeacherDirectory() {
     setEditTeacher(t);
     setShowAdd(true);
   }}
-  className="text-blue-600 hover:text-blue-800"
+  className="text-slate-400 hover:text-blue-600 transition"
 >
-  ✏️
+  <PencilIcon className="w-[18px] h-[18px]" />
 </button>
 
 <button
   title="Disable (coming soon)"
-  className="text-slate-400 cursor-not-allowed"
+  className="text-slate-300 cursor-not-allowed"
 >
-  🚫
+  <BanIcon className="w-[18px] h-[18px]" />
 </button>
 
                     </div>

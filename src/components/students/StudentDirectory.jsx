@@ -3,6 +3,7 @@ import AddStudentModal from "./AddStudentModal";
 import ViewStudentModal from "./ViewStudentModal";
 import EditStudentModal from "./EditStudentModal";
 import api from "../../api/axios";
+import { EyeIcon, PencilIcon } from "../common/Icons";
 
 export default function StudentDirectory() {
   const [showAdd, setShowAdd] = useState(false);
@@ -142,18 +143,18 @@ export default function StudentDirectory() {
                         <button
                           title="View Student"
                           onClick={() => setViewStudent(s)}
-                          className="text-slate-500 hover:text-blue-600"
+                          className="text-slate-400 hover:text-blue-600 transition"
                           data-testid={`view-student-${s.id}`}
                         >
-                          👁
+                          <EyeIcon className="w-[18px] h-[18px]" />
                         </button>
                         <button
                           title="Edit Student"
                           onClick={() => setEditStudent(s)}
-                          className="text-slate-500 hover:text-blue-600"
+                          className="text-slate-400 hover:text-blue-600 transition"
                           data-testid={`edit-student-${s.id}`}
                         >
-                          ✏️
+                          <PencilIcon className="w-[18px] h-[18px]" />
                         </button>
                       </div>
                     </td>

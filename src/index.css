@@ -1,50 +1,64 @@
 @import "tailwindcss";
 
-/* Scrollbar */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 4px; }
+/* ===== MODERN DESIGN SYSTEM ===== */
 
-/* ===== GLOBAL RESPONSIVE FIXES ===== */
+/* Base typography */
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #1e293b;
+  background: #f8fafc;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background-color: #94a3b8; }
+
+/* Modern input styling */
+input, select, textarea {
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+  outline: none !important;
+}
+
+/* Modern button transitions */
+button { transition: all 0.15s ease; }
+
+/* Card hover effect */
+.hover\:bg-slate-50:hover { background-color: #f8fafc; }
 
 /* Tables: horizontal scroll on mobile */
 table { min-width: 600px; }
-.overflow-y-auto, .overflow-x-auto { -webkit-overflow-scrolling: touch; }
 
-/* Fix fixed-height containers on mobile */
+/* ===== RESPONSIVE FIXES ===== */
 @media (max-width: 640px) {
-  /* Override calc heights that assume desktop sidebar */
-  [class*="h-[calc(100vh"] { height: auto !important; min-height: 300px; max-height: 60vh; }
-
-  /* Stack grid columns */
-  .grid-cols-2, .grid-cols-3, .grid-cols-4, .sm\:grid-cols-2, .xl\:grid-cols-4 {
-    grid-template-columns: 1fr !important;
-  }
-
-  /* Smaller headings */
+  [class*="h-[calc(100vh"] { height: auto !important; min-height: 200px; max-height: 65vh; }
   h2 { font-size: 1.25rem !important; }
   h3 { font-size: 1rem !important; }
 
-  /* Tabs: scroll horizontally */
-  .border-b.flex.gap-6 { overflow-x: auto; white-space: nowrap; gap: 1rem !important; padding-bottom: 0.5rem; }
+  /* Tabs scroll horizontally */
+  .border-b.flex.gap-6 { overflow-x: auto; white-space: nowrap; gap: 0.75rem !important; }
   .border-b.flex.gap-6::-webkit-scrollbar { display: none; }
 
-  /* Filter bars: stack vertically */
-  .flex.gap-3.items-end { flex-wrap: wrap; }
-  .flex.gap-3.items-end > * { flex: 1 1 100%; min-width: 0; }
-  .flex.gap-3.items-end > button { flex: 0 0 auto; }
+  /* Filter bars wrap */
+  .flex.gap-3.items-end, .flex.gap-3.flex-wrap { flex-wrap: wrap; }
 
-  /* Modals: full width on mobile */
+  /* Modals full width */
   .max-w-md, .max-w-lg, .max-w-xl, .max-w-2xl { max-width: calc(100vw - 2rem) !important; }
 
-  /* Stat cards in dashboard */
-  .grid.grid-cols-1.sm\:grid-cols-2.xl\:grid-cols-4 { grid-template-columns: 1fr !important; }
+  /* Grid stacking */
+  .grid-cols-2, .grid-cols-3, .grid-cols-4 { grid-template-columns: 1fr !important; }
 }
 
-/* Tablet */
 @media (min-width: 641px) and (max-width: 1023px) {
-  .grid-cols-4 { grid-template-columns: repeat(2, 1fr) !important; }
   .xl\:grid-cols-4 { grid-template-columns: repeat(2, 1fr) !important; }
 }
 
-/* Ensure tables are scrollable in their containers */
+/* Table containers scroll */
 .bg-white.rounded-xl.border { overflow-x: auto; }
