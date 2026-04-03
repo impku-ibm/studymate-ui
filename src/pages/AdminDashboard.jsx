@@ -13,7 +13,11 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     api.get("/dashboard/summary")
-       .then(res => setSummary(res.data));
+       .then(res => setSummary({
+         ...res.data,
+         recentActivities: res.data.recentActivities || []
+       }))
+       .catch(() => {});
   }, []);
 
   return (
@@ -66,13 +70,13 @@ export default function AdminDashboard() {
         </div>
 
         <div className="p-6">
-          {summary.recentActivities.length === 0 ? (
+          {(summary.recentActivities?.length ?? 0) === 0 ? (
             <p className="text-sm text-slate-500">
               No recent activity
             </p>
           ) : (
             <ul className="space-y-3 text-sm">
-              {summary.recentActivities.map((a, i) => (
+              {(summary.recentActivities || []).map((a, i) => (
                 <li
                   key={i}
                   className="flex items-start gap-2 text-slate-700"

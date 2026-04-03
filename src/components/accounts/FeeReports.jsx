@@ -1,46 +1,51 @@
+import { useState } from "react";
+import Dashboard from "./reports/Dashboard";
+import DailyCollectionReport from "./reports/DailyCollectionReport";
+import OutstandingFeesReport from "./reports/OutstandingFeesReport";
+import CollectionTrendChart from "./reports/CollectionTrendChart";
+
 export default function FeeReports() {
+  const [activeTab, setActiveTab] = useState("dashboard");
+
   return (
-    <>
-      <div className="bg-blue-50 p-3 rounded text-sm text-blue-700">
-        View financial summaries and breakdowns
+    <div className="space-y-6">
+
+      {/* Header */}
+      <div>
+        <h2 className="text-lg font-semibold">Reports & Analytics</h2>
+        <p className="text-sm text-slate-500">
+          Financial summaries, trends and outstanding analysis
+        </p>
       </div>
 
-      <div className="flex gap-4">
-        <Stat label="Collected" value="₹18,000" />
-        <Stat label="Pending" value="₹31,000" />
-        <Stat label="Collection Rate" value="37%" />
+      {/* Sub Tabs */}
+      <div className="border-b flex gap-6 text-sm">
+        <Tab label="Dashboard" active={activeTab === "dashboard"} onClick={() => setActiveTab("dashboard")} />
+        <Tab label="Daily Collection" active={activeTab === "daily"} onClick={() => setActiveTab("daily")} />
+        <Tab label="Outstanding Fees" active={activeTab === "outstanding"} onClick={() => setActiveTab("outstanding")} />
+        <Tab label="Collection Trend" active={activeTab === "trend"} onClick={() => setActiveTab("trend")} />
       </div>
 
-      <div className="bg-white rounded-xl border shadow-sm p-6">
-        <h4 className="font-medium mb-4">Class-wise Breakdown</h4>
-        <table className="w-full text-sm">
-          <thead className="bg-slate-50 border-b">
-            <tr>
-              <th className="px-4 py-2 text-left">Class</th>
-              <th className="px-4 py-2 text-left">Total</th>
-              <th className="px-4 py-2 text-left">Collected</th>
-              <th className="px-4 py-2 text-left">Pending</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr className="border-b">
-              <td className="px-4 py-3">Class 10</td>
-              <td className="px-4 py-3">₹32,000</td>
-              <td className="px-4 py-3 text-green-600">₹15,000</td>
-              <td className="px-4 py-3 text-red-600">₹17,000</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </>
+      {/* Content */}
+      {activeTab === "dashboard" && <Dashboard />}
+      {activeTab === "daily" && <DailyCollectionReport />}
+      {activeTab === "outstanding" && <OutstandingFeesReport />}
+      {activeTab === "trend" && <CollectionTrendChart />}
+    </div>
   );
 }
 
-function Stat({ label, value }) {
+function Tab({ label, active, onClick }) {
   return (
-    <div className="bg-white border rounded-lg p-4 w-48">
-      <p className="text-xs text-slate-500">{label}</p>
-      <p className="text-xl font-semibold">{value}</p>
-    </div>
+    <button
+      onClick={onClick}
+      className={`pb-2 border-b-2 ${
+        active
+          ? "border-blue-600 text-blue-600 font-medium"
+          : "border-transparent text-slate-500"
+      }`}
+    >
+      {label}
+    </button>
   );
 }

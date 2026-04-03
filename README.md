@@ -1,121 +1,73 @@
-# School Management System – Admin UI
+# StudyMate ERP — Frontend
 
-This repository contains the **Admin UI (Frontend)** for the School Management System.  
-The UI is built **backend-first**, strictly aligned with already implemented backend APIs, without redesigning or reworking backend logic.
+React SPA for the StudyMate School ERP system.
 
-The goal is to provide a **clean, ERP-style interface** for managing school master data.
+## Tech Stack
+- React 19, Vite 7, Tailwind CSS 4
+- React Router 7, Axios, Recharts
+- Vitest + React Testing Library
 
----
+## Features
+- 3 role-based portals: Admin, Teacher, Student
+- 15+ pages: Dashboard, Students, Teachers, Exams, Attendance, Accounts, Timetable, Staff
+- Real-time data from REST APIs
+- Responsive design
 
-## 🛠 Tech Stack
-
-- **React** (Functional Components + Hooks)
-- **Axios** – REST API communication
-- **Tailwind CSS** – Styling & layout
-- **JWT-based Authentication** (handled by backend)
-- **RESTful APIs**
-
----
-
-## 🎯 Scope of This UI (Current Phase)
-
-This UI currently focuses on **School Master Data Setup**, which acts as the foundation for all academic and operational modules.
-
----
-
-## ✅ Modules Implemented So Far
-
-### 1️⃣ Academic Year Management
-- Create Academic Year
-- Automatically enforces **only one ACTIVE academic year**
-- List all academic years
-- Status badges (ACTIVE / INACTIVE)
-- Activate academic year via API
-
-**APIs Used**
-
----
-
-### 2️⃣ Class Management
-- Fetch and list classes
-- Class selection acts as a **context selector** for Sections and Subjects
-
-**APIs Used**
-
----
-
-### 3️⃣ Section Management
-- Sections are always managed **within a selected class**
-- First class is auto-selected on page load
-- Sections auto-load when class changes
-- Create section via modal
-- Immediate refresh after creation
-
-**APIs Used**
-
----
-
-### 4️⃣ Subject Management
-- Subjects are managed under **Class + Academic Year**
-- Subject creation and listing integrated with existing backend APIs
-- Same UI pattern as Sections
-- No backend rework or duplication
-
-**APIs Used**
-
----
-
-## 🧠 UX & Design Decisions
-
-- **Context-first UI**
-  - Sections are never shown without a Class
-  - Subjects are never shown without Class / Academic Year
-- **No empty screens**
-  - Default class auto-selected
-  - Data loads automatically on page load
-- **ERP-style design**
-  - Tables for listing data
-  - Modals for create actions
-- **Minimal user actions**
-- **Backend is the single source of truth**
-
----
-
-## 🔄 Data Hierarchy Followed
-
-
-Each UI screen strictly respects this hierarchy.
-
----
-
-## 📁 Project Structure (Simplified)
-
-src/
-├── api/
-│ └── axios.js
-├── components/
-│ ├── academicYear/
-│ │ ├── AcademicYearTable.jsx
-│ │ └── AddAcademicYearModal.jsx
-│ ├── class/
-│ │ └── ClassSetup.jsx
-│ ├── section/
-│ │ ├── SectionSetup.jsx
-│ │ └── AddSectionModal.jsx
-│ └── subject/
-│ ├── SubjectSetup.jsx
-│ └── AddSubjectModal.jsx
-├── pages/
-│ └── SchoolSetup.jsx
-└── App.jsx
-
-
----
-
-## ⚙️ Setup & Run Instructions
-
-### 1️⃣ Install dependencies
+## Quick Start
 ```bash
+# 1. Install
 npm install
+
+# 2. Run dev server
 npm run dev
-npm start
+# Opens at http://localhost:5173
+
+# 3. Build for production
+npm run build
+```
+
+## Pages
+
+### Admin Portal (`/admin`)
+- Dashboard — Stats overview
+- Students — Directory, enrollment, promotion
+- Teachers — Directory, assignments
+- Exams — Create, schedule, marks entry, results
+- Attendance — Mark, summary, history, teacher self-mark
+- Accounts — Fee structure, fee plans, collection, reports
+- Staff — Non-teaching staff management
+- Timetable — Period setup, class/teacher views
+- School Setup — Academic year, classes, sections, subjects, grading
+
+### Teacher Portal (`/teacher`)
+- Dashboard — Self-attendance, quick actions
+- Marks Entry — Enter marks per exam/subject
+- Attendance — Mark class attendance
+- Timetable — Own weekly schedule
+
+### Student Portal (`/student`)
+- Dashboard — Overview cards
+- Attendance — Monthly summary
+- Fees — Fee status and payments
+- Results — Published exam results
+
+## Running Tests
+```bash
+npm run test
+# 16 tests, 0 failures
+```
+
+## Environment
+The API base URL is configured in `src/api/axios.js`:
+```javascript
+baseURL: "http://localhost:8080"
+```
+
+For production, update this to your Render backend URL.
+
+## Deployment (Render)
+1. Create a Static Site on Render
+2. Connect this GitHub repo
+3. Build command: `npm run build`
+4. Publish directory: `dist`
+5. Add redirect rule: `/* → /index.html` (for SPA routing)

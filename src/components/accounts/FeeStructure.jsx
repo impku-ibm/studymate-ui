@@ -1,106 +1,304 @@
-import { useState } from "react";
+import { useEffect, useState, useContext, useMemo } from "react";
 import DefineFeeModal from "./DefineFeeModal";
+import { getFeeStructures, deleteFeeStructure } from "../../api/accountsApi";
+import { AcademicYearContext } from "../../context/AcademicYearContext";
 
-export default function FeeStructure({ fees = [] }) {
-  const [showDefine, setShowDefine] = useState(false);
-
-  // 🔹 Group fees by class
-  const grouped = fees.reduce((acc, fee) => {
-    acc[fee.className] = acc[fee.className] || [];
-    acc[fee.className].push(fee);
-    return acc;
-  }, {});
-
+/* ================= ICONS (NO DEPENDENCIES) ================= */
+function SearchIcon({ onClick }) {
   return (
-    <div className="space-y-6">
+    <svg
+      onClick={onClick}
+      className="w-4 h-4 cursor-pointer text-slate-500 hover:text-slate-700"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      viewBox="0 0 24 24"
+    >
+      <circle cx="11" cy="11" r="8" />
+      <line x1="21" y1="21" x2="16.65" y2="16.65" />
+    </svg>
+  );
+}
+
+function CloseIcon({ onClick }) {
+  return (
+    <svg
+      onClick={onClick}
+      className="w-4 h-4 cursor-pointer text-slate-500 hover:text-slate-700"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      viewBox="0 0 24 24"
+    >
+      <line x1="18" y1="6" x2="6" y2="18" />
+      <line x1="6" y1="6" x2="18" y2="18" />
+    </svg>
+  );
+}
+
+/* ================= MAIN COMPONENT ================= */
+export default function FeeStructure() {
+  const { academicYearId, academicYearLabel } =
+    useContext(AcademicYearContext);
+
+  const [allFees, setAllFees] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  /* Pagination (frontend only) */
+  const [page, setPage] = useState(0);
+  const pageSize = 6;
+
+  /* Header search state */
+  const [classSearchOpen, setClassSearchOpen] = useState(false);
+  const [feeTypeSearchOpen, setFeeTypeSearchOpen] = useState(false);
+  const [classQuery, setClassQuery] = useState("");
+  const [feeTypeQuery, setFeeTypeQuery] = useState("");
+
+  const [showDefine, setShowDefine] = useState(false);
+  const [editingFee, setEditingFee] = useState(null);
+
+  /* ================= LOAD DATA ================= */
+  useEffect(() => {
+    if (!academicYearId) return;
+
+    setLoading(true);
+    getFeeStructures(academicYearId)
+      .then(res => {
+        const list =
+          Array.isArray(res.data)
+            ? res.data
+            : res.data?.content ?? [];
+        setAllFees(list);
+        setPage(0);
+      })
+      .finally(() => setLoading(false));
+  }, [academicYearId]);
+
+  /* ================= FILTER ================= */
+  const filteredFees = useMemo(() => {
+    return allFees.filter(fee => {
+      const matchClass =
+        !classQuery ||
+        fee.className
+          ?.toLowerCase()
+          .includes(classQuery.toLowerCase());
+
+      const matchFeeType =
+        !feeTypeQuery ||
+        fee.feeType
+          ?.toLowerCase()
+          .includes(feeTypeQuery.toLowerCase());
+
+      return matchClass && matchFeeType;
+    });
+  }, [allFees, classQuery, feeTypeQuery]);
+
+  /* ================= PAGINATION ================= */
+  const total = filteredFees.length;
+  const start = page * pageSize;
+  const end = start + pageSize;
+  const visibleFees = filteredFees.slice(start, end);
+
+  /* ================= UI ================= */
+  return (
+    <div className="space-y-4">
 
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex justify-between items-start">
         <div>
-          <h2 className="text-lg font-semibold text-slate-900">
-            Fee Structure
-          </h2>
-          <p className="text-sm text-slate-500">
+          <h2 className="text-base font-semibold">Fee Structure</h2>
+          <p className="text-xs text-slate-500">
             Define fee types and amounts (configuration only)
           </p>
         </div>
 
         <button
-          onClick={() => setShowDefine(true)}
-          className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg
-                     hover:bg-blue-500 transition"
+          onClick={() => {
+            setEditingFee(null);
+            setShowDefine(true);
+          }}
+          className="px-3 py-1.5 bg-blue-600 text-white rounded-md text-sm"
         >
           + Define Fee
         </button>
       </div>
 
-      {/* Info bar */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 text-sm text-blue-700">
-        Fees are defined per academic year and class. These do not track payments.
+      {/* Info */}
+      <div className="bg-blue-50 border border-blue-200 rounded-md px-3 py-2 text-sm text-blue-700">
+        Academic Year: <b>{academicYearLabel}</b>
       </div>
 
-      {/* Grouped Fees */}
-      {Object.keys(grouped).length === 0 ? (
-        <div className="bg-white rounded-xl border p-12 text-center text-slate-500">
-          No fee structure defined yet
-        </div>
-      ) : (
-        Object.entries(grouped).map(([className, items]) => (
-          <div
-            key={className}
-            className="bg-white rounded-xl border border-slate-200 shadow-sm"
-          >
-            {/* Class Header */}
-            <div className="px-6 py-4 border-b bg-slate-50 rounded-t-xl">
-              <h3 className="font-medium text-slate-800">
-                {className}
-              </h3>
-            </div>
+      {/* ================= TABLE ================= */}
+      <div className="bg-white border rounded-lg max-w-[96%] mx-auto flex flex-col">
 
-            {/* Fee Table */}
-            <table className="w-full text-sm">
-              <thead className="border-b">
-                <tr className="text-slate-500">
-                  <th className="px-6 py-3 text-left">Fee Type</th>
-                  <th className="px-6 py-3 text-left">Amount</th>
-                  <th className="px-6 py-3 text-left">Due Date</th>
-                  <th className="px-6 py-3 text-right">Actions</th>
+        {/* Scroll area */}
+        <div
+          className="overflow-auto"
+          style={{ maxHeight: "calc(100vh - 360px)" }}
+        >
+          <table className="w-full text-sm table-fixed">
+            <thead className="sticky top-0 bg-slate-50 border-b z-10">
+              <tr>
+
+                {/* CLASS HEADER WITH SEARCH */}
+                <th className="px-4 py-2 text-left w-40">
+                  <div className="flex items-center gap-1">
+                    <span>Class</span>
+                    {!classSearchOpen ? (
+                      <SearchIcon
+                        onClick={() => setClassSearchOpen(true)}
+                      />
+                    ) : (
+                      <div className="flex items-center gap-1">
+                        <input
+                          autoFocus
+                          value={classQuery}
+                          onChange={e => {
+                            setClassQuery(e.target.value);
+                            setPage(0);
+                          }}
+                          className="border px-1 py-0.5 text-xs rounded w-20"
+                          placeholder="Search"
+                        />
+                        <CloseIcon
+                          onClick={() => {
+                            setClassQuery("");
+                            setClassSearchOpen(false);
+                          }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </th>
+
+                {/* FEE TYPE HEADER WITH SEARCH */}
+                <th className="px-4 py-2 text-left w-40">
+                  <div className="flex items-center gap-1">
+                    <span>Fee Type</span>
+                    {!feeTypeSearchOpen ? (
+                      <SearchIcon
+                        onClick={() => setFeeTypeSearchOpen(true)}
+                      />
+                    ) : (
+                      <div className="flex items-center gap-1">
+                        <input
+                          autoFocus
+                          value={feeTypeQuery}
+                          onChange={e => {
+                            setFeeTypeQuery(e.target.value);
+                            setPage(0);
+                          }}
+                          className="border px-1 py-0.5 text-xs rounded w-24"
+                          placeholder="Search"
+                        />
+                        <CloseIcon
+                          onClick={() => {
+                            setFeeTypeQuery("");
+                            setFeeTypeSearchOpen(false);
+                          }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </th>
+
+                <th className="px-4 py-2 text-left w-28">Amount</th>
+                <th className="px-4 py-2 text-left w-32">Due Date</th>
+                <th className="px-4 py-2 text-left w-24">Status</th>
+                <th className="px-4 py-2 text-right w-28">Actions</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td colSpan="6" className="py-6 text-center">
+                    Loading…
+                  </td>
                 </tr>
-              </thead>
-
-              <tbody>
-                {items.map(fee => (
+              ) : visibleFees.length === 0 ? (
+                <tr>
+                  <td colSpan="6" className="py-6 text-center">
+                    No matching records
+                  </td>
+                </tr>
+              ) : (
+                visibleFees.map(fee => (
                   <tr
                     key={fee.id}
-                    className="border-b last:border-none hover:bg-slate-50"
+                    className="border-b hover:bg-slate-50"
                   >
-                    <td className="px-6 py-4 font-medium">
-                      {fee.feeType}
+                    <td className="px-4 py-2">{fee.className}</td>
+                    <td className="px-4 py-2">{fee.feeType}</td>
+                    <td className="px-4 py-2">₹{fee.amount}</td>
+                    <td className="px-4 py-2">{fee.dueDate}</td>
+                    <td className="px-4 py-2">
+                      <span
+                        className={`px-2 py-0.5 rounded-full text-xs ${
+                          fee.active
+                            ? "bg-green-100 text-green-700"
+                            : "bg-red-100 text-red-700"
+                        }`}
+                      >
+                        {fee.active ? "ACTIVE" : "INACTIVE"}
+                      </span>
                     </td>
-                    <td className="px-6 py-4">
-                      ₹{fee.amount}
-                    </td>
-                    <td className="px-6 py-4">
-                      {fee.dueDate}
-                    </td>
-                    <td className="px-6 py-4 text-right space-x-3">
-                      <button className="text-blue-600 text-sm hover:underline">
+                    <td className="px-4 py-2 text-right space-x-2">
+                      <button className="text-blue-600 text-sm">
                         Edit
                       </button>
-                      <button className="text-red-500 text-sm hover:underline">
+                      <button
+                        className="text-red-600 text-sm"
+                        onClick={() =>
+                          deleteFeeStructure(fee.id).then(() =>
+                            setAllFees(f =>
+                              f.filter(x => x.id !== fee.id)
+                            )
+                          )
+                        }
+                      >
                         Delete
                       </button>
                     </td>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ))
-      )}
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
 
+        {/* ================= PAGINATION ================= */}
+        <div className="flex justify-between items-center px-4 py-2 border-t bg-slate-50 text-sm">
+          <span>
+            Showing {start + 1}–{Math.min(end, total)} of {total}
+          </span>
+          <div className="flex gap-2">
+            <button
+              disabled={page === 0}
+              onClick={() => setPage(p => p - 1)}
+              className="px-2 py-1 border rounded disabled:opacity-40"
+            >
+              Prev
+            </button>
+            <button
+              disabled={end >= total}
+              onClick={() => setPage(p => p + 1)}
+              className="px-2 py-1 border rounded disabled:opacity-40"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Modal */}
       {showDefine && (
-        <DefineFeeModal onClose={() => setShowDefine(false)} />
+        <DefineFeeModal
+          fee={editingFee}
+          academicYear={academicYearLabel}
+          onClose={() => setShowDefine(false)}
+          onSave={() => setShowDefine(false)}
+        />
       )}
     </div>
   );

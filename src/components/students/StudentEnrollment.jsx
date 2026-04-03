@@ -6,6 +6,10 @@ export default function StudentEnrollment() {
   const [enrollments, setEnrollments] = useState([]);
   const [showEnroll, setShowEnroll] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [classes, setClasses] = useState([]);
+  const [sections, setSections] = useState([]);
+  const [selectedClass, setSelectedClass] = useState("");
+  const [selectedSection, setSelectedSection] = useState("");
 
   const loadEnrollments = async () => {
     setLoading(true);
@@ -21,7 +25,16 @@ export default function StudentEnrollment() {
 
   useEffect(() => {
     loadEnrollments();
+    api.get("/classes").then(res => setClasses(res.data)).catch(() => {});
   }, []);
+
+  useEffect(() => {
+    if (selectedClass) {
+      api.get(`/classes/${selectedClass}/sections`).then(res => setSections(res.data)).catch(() => {});
+    } else {
+      setSections([]);
+    }
+  }, [selectedClass]);
 
   return (
     <div className="space-y-6">
@@ -34,12 +47,16 @@ export default function StudentEnrollment() {
         </span>
 
         {/* Filters (future-ready) */}
-        <select className="ml-auto px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white">
-          <option>Class</option>
+        <select value={selectedClass} onChange={e => setSelectedClass(e.target.value)}
+          className="ml-auto px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white">
+          <option value="">All Classes</option>
+          {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
         </select>
 
-        <select className="px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white">
-          <option>Section</option>
+        <select value={selectedSection} onChange={e => setSelectedSection(e.target.value)}
+          className="px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white">
+          <option value="">All Sections</option>
+          {sections.map(s => <option key={s.id} value={s.name}>{s.name}</option>)}
         </select>
 
         <button

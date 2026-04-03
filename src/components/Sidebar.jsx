@@ -99,6 +99,19 @@ export default function Sidebar() {
         </NavLink>
 
         <NavLink
+          to="/admin/staff"
+          className={({ isActive }) =>
+            `${linkClass} ${
+              isActive
+                ? "bg-blue-600 text-white"
+                : "hover:bg-slate-700"
+            }`
+          }
+        >
+          Staff
+        </NavLink>
+
+        <NavLink
           to="/admin/exams"
           className={({ isActive }) =>
             `${linkClass} ${
@@ -109,6 +122,32 @@ export default function Sidebar() {
           }
         >
           Exams
+        </NavLink>
+
+        <NavLink
+          to="/admin/attendance"
+          className={({ isActive }) =>
+            `${linkClass} ${
+              isActive
+                ? "bg-blue-600 text-white"
+                : "hover:bg-slate-700"
+            }`
+          }
+        >
+          Attendance
+        </NavLink>
+
+        <NavLink
+          to="/admin/timetable"
+          className={({ isActive }) =>
+            `${linkClass} ${
+              isActive
+                ? "bg-blue-600 text-white"
+                : "hover:bg-slate-700"
+            }`
+          }
+        >
+          Timetable
         </NavLink>
       </nav>
 

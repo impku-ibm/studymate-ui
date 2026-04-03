@@ -1,33 +1,104 @@
-import { useState } from "react";
+import { useState, useEffect, useContext } from "react";
+import { createFeeStructure, getClasses } from "../../api/accountsApi";
+import { AcademicYearContext } from "../../context/AcademicYearContext";
 
-export default function DefineFeeModal({
-  academicYear,
-  onClose,
-  onSave
-}) {
+export default function DefineFeeModal({fee, existingFees = [], academicYear, onClose, onSave }) {
+  const { academicYearId } = useContext(AcademicYearContext);
+
+  const [classes, setClasses] = useState([]);
+  const [classId, setClassId] = useState("");
+
   const [feeType, setFeeType] = useState("");
   const [amount, setAmount] = useState("");
   const [dueDate, setDueDate] = useState("");
+
+  const [saving, setSaving] = useState(false);
+  const [loadingClasses, setLoadingClasses] = useState(false);
+
+  const duplicate = existingFees.some(f =>
+  f.classId === classId &&
+  f.feeType === feeType &&
+  f.id !== fee?.id
+);
+
+if (duplicate) {
+  alert("Fee already defined for this class and fee type");
+  return;
+}
+
+  // ✅ Load all classes
+  useEffect(() => {
+    setLoadingClasses(true);
+    getClasses()
+      .then(res => {
+        const list =
+          Array.isArray(res.data)
+            ? res.data
+            : Array.isArray(res.data?.data)
+            ? res.data.data
+            : [];
+
+        setClasses(list);
+      })
+      .finally(() => setLoadingClasses(false));
+  }, []);
+
+  const submit = async () => {
+    if (!classId || !feeType || !amount || !dueDate) return;
+
+    setSaving(true);
+    try {
+      await createFeeStructure({
+        academicYearId,
+        classId,
+        feeType,
+        amount,
+        dueDate
+      });
+      onSave();
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
       <div className="bg-white w-[520px] rounded-xl shadow-lg">
 
         {/* Header */}
-        <div className="px-6 py-4 border-b">
-          <h3 className="text-lg font-semibold text-slate-900">
-            Define Fee Structure
-          </h3>
+        <div className="px-6 py-4 border-b font-semibold">
+          Define Fee Structure
         </div>
 
         {/* Info */}
         <div className="px-6 py-3 bg-blue-50 text-blue-700 text-sm">
-          This fee will be defined for Academic Year{" "}
-          <strong>{academicYear}</strong>
+          This fee will be defined for Academic Year <b>{academicYear}</b>
         </div>
 
         {/* Form */}
         <div className="p-6 space-y-4">
+
+          {/* Class Dropdown */}
+          <div>
+            <label className="block text-xs text-slate-500 mb-1">
+              Class *
+            </label>
+            <select
+              value={classId}
+              onChange={e => setClassId(e.target.value)}
+              className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm"
+              disabled={loadingClasses}
+            >
+              <option value="">
+                {loadingClasses ? "Loading classes..." : "Select Class"}
+              </option>
+              {classes.map(cls => (
+                <option key={cls.id} value={cls.id}>
+                  {cls.name || cls.className}
+                </option>
+              ))}
+            </select>
+          </div>
 
           {/* Fee Type */}
           <div>
@@ -40,10 +111,12 @@ export default function DefineFeeModal({
               className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm"
             >
               <option value="">Select Fee Type</option>
-              <option>Tuition Fee</option>
-              <option>Transport Fee</option>
-              <option>Exam Fee</option>
-              <option>Miscellaneous</option>
+              <option>TUITION</option>
+              <option>ADMISSION</option>
+              <option>EXAM</option>
+              <option>TRANSPORT</option>
+              <option>HOSTEL</option>
+              <option>MISC</option>
             </select>
           </div>
 
@@ -73,6 +146,7 @@ export default function DefineFeeModal({
               className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm"
             />
           </div>
+
         </div>
 
         {/* Footer */}
@@ -85,20 +159,20 @@ export default function DefineFeeModal({
           </button>
 
           <button
-            disabled={!feeType || !amount || !dueDate}
-            onClick={() =>
-              onSave({
-                feeType,
-                amount,
-                dueDate
-              })
+            disabled={
+              saving ||
+              !classId ||
+              !feeType ||
+              !amount ||
+              !dueDate
             }
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm
-                       disabled:opacity-50"
+            onClick={submit}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm disabled:opacity-50"
           >
-            Define Fee
+            {saving ? "Saving..." : "Define Fee"}
           </button>
         </div>
+
       </div>
     </div>
   );

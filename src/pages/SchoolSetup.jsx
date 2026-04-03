@@ -3,12 +3,16 @@ import AcademicYearSetup from "../components/setup/AcademicYearSetup";
 import ClassSetup from "../components/setup/ClassSetup";
 import SectionSetup from "../components/setup/SectionSetup";
 import SubjectSetup from "../components/setup/SubjectSetup";
+import ClassSubjectSetup from "../components/setup/ClassSubjectSetup";
+import GradingScaleSetup from "../components/setup/GradingScaleSetup";
 
 const tabs = [
   { key: "year", label: "Academic Year" },
   { key: "class", label: "Classes" },
   { key: "section", label: "Sections" },
   { key: "subject", label: "Subjects" },
+  { key: "classSubject", label: "Class Subjects" },
+  { key: "grading", label: "Grading Scale" },
 ];
 
 export default function SchoolSetup() {
@@ -45,6 +49,8 @@ export default function SchoolSetup() {
       {activeTab === "class" && <ClassSetup />}
       {activeTab === "section" && <SectionSetup />}
       {activeTab === "subject" && <SubjectSetup />}
+      {activeTab === "classSubject" && <ClassSubjectSetup />}
+      {activeTab === "grading" && <GradingScaleSetup />}
     </div>
   );
 }
