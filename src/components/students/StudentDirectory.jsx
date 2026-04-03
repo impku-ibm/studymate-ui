@@ -1,9 +1,13 @@
 import { useEffect, useState } from "react";
 import AddStudentModal from "./AddStudentModal";
+import ViewStudentModal from "./ViewStudentModal";
+import EditStudentModal from "./EditStudentModal";
 import api from "../../api/axios";
 
 export default function StudentDirectory() {
   const [showAdd, setShowAdd] = useState(false);
+  const [viewStudent, setViewStudent] = useState(null);
+  const [editStudent, setEditStudent] = useState(null);
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -133,18 +137,21 @@ export default function StudentDirectory() {
                       </span>
                     </td>
 
-                    {/* Actions – INLINE like Teacher */}
                     <td className="px-6 py-4 text-right">
                       <div className="inline-flex items-center gap-3">
                         <button
                           title="View Student"
+                          onClick={() => setViewStudent(s)}
                           className="text-slate-500 hover:text-blue-600"
+                          data-testid={`view-student-${s.id}`}
                         >
                           👁
                         </button>
                         <button
                           title="Edit Student"
+                          onClick={() => setEditStudent(s)}
                           className="text-slate-500 hover:text-blue-600"
+                          data-testid={`edit-student-${s.id}`}
                         >
                           ✏️
                         </button>
@@ -167,6 +174,24 @@ export default function StudentDirectory() {
           onClose={() => setShowAdd(false)}
           onSuccess={() => {
             setShowAdd(false);
+            loadStudents();
+          }}
+        />
+      )}
+
+      {viewStudent && (
+        <ViewStudentModal
+          student={viewStudent}
+          onClose={() => setViewStudent(null)}
+        />
+      )}
+
+      {editStudent && (
+        <EditStudentModal
+          student={editStudent}
+          onClose={() => setEditStudent(null)}
+          onSuccess={() => {
+            setEditStudent(null);
             loadStudents();
           }}
         />

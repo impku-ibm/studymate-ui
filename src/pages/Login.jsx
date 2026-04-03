@@ -40,7 +40,7 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow w-96">
+      <div className="bg-white p-6 sm:p-8 rounded-lg shadow w-full max-w-sm mx-4">
         <h1 className="text-center text-2xl font-bold text-indigo-600">
           STUDYMATE
         </h1>

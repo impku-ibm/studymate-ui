@@ -1,15 +1,24 @@
 import { NavLink } from "react-router-dom";
 
-export default function Sidebar() {
-  const school = JSON.parse(localStorage.getItem("school"));
+export default function Sidebar({ onClose }) {
+  const school = JSON.parse(localStorage.getItem("school") || "{}");
 
   const linkClass =
     "block px-4 py-2.5 rounded-lg text-sm font-medium transition";
 
+  const handleNavClick = () => {
+    if (onClose) onClose(); // Close sidebar on mobile after navigation
+  };
+
   return (
-    <aside className="w-64 min-h-screen bg-gradient-to-b
-                      from-slate-900 to-slate-800
-                      text-slate-200 px-4 py-6">
+    <aside className="w-64 h-full bg-gradient-to-b from-slate-900 to-slate-800 text-slate-200 px-4 py-6 overflow-y-auto">
+
+      {/* Mobile close button */}
+      <button onClick={onClose} className="lg:hidden absolute top-4 right-4 text-slate-400 hover:text-white">
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
 
       {/* School Info */}
       <div className="mb-8">
@@ -23,7 +32,7 @@ export default function Sidebar() {
 
       {/* Main Nav */}
       <nav className="space-y-1">
-        <NavLink
+        <NavLink onClick={handleNavClick}
           to="/admin"
           className={({ isActive }) =>
             `${linkClass} ${
@@ -36,7 +45,7 @@ export default function Sidebar() {
           Dashboard
         </NavLink>
 
-        <NavLink
+        <NavLink onClick={handleNavClick}
           to="/admin/students"
           className={({ isActive }) =>
             `${linkClass} ${
@@ -49,7 +58,7 @@ export default function Sidebar() {
           Students
         </NavLink>
 
-        <NavLink
+        <NavLink onClick={handleNavClick}
           to="/admin/teachers"
           className={({ isActive }) =>
             `${linkClass} ${
@@ -72,7 +81,7 @@ export default function Sidebar() {
       </p>
 
       <nav className="space-y-1">
-        <NavLink
+        <NavLink onClick={handleNavClick}
           to="/admin/setup"
           className={({ isActive }) =>
             `${linkClass} ${
@@ -85,7 +94,7 @@ export default function Sidebar() {
           School Setup
         </NavLink>
 
-        <NavLink
+        <NavLink onClick={handleNavClick}
           to="/admin/accounts"
           className={({ isActive }) =>
             `${linkClass} ${
@@ -98,7 +107,7 @@ export default function Sidebar() {
           Accounts
         </NavLink>
 
-        <NavLink
+        <NavLink onClick={handleNavClick}
           to="/admin/staff"
           className={({ isActive }) =>
             `${linkClass} ${
@@ -111,7 +120,7 @@ export default function Sidebar() {
           Staff
         </NavLink>
 
-        <NavLink
+        <NavLink onClick={handleNavClick}
           to="/admin/exams"
           className={({ isActive }) =>
             `${linkClass} ${
@@ -124,7 +133,7 @@ export default function Sidebar() {
           Exams
         </NavLink>
 
-        <NavLink
+        <NavLink onClick={handleNavClick}
           to="/admin/attendance"
           className={({ isActive }) =>
             `${linkClass} ${
@@ -137,7 +146,7 @@ export default function Sidebar() {
           Attendance
         </NavLink>
 
-        <NavLink
+        <NavLink onClick={handleNavClick}
           to="/admin/timetable"
           className={({ isActive }) =>
             `${linkClass} ${
@@ -152,7 +161,7 @@ export default function Sidebar() {
       </nav>
 
       {/* Footer */}
-      <div className="absolute bottom-4 left-4 text-xs text-slate-500">
+      <div className="mt-8 pt-4 border-t border-slate-700 text-xs text-slate-500">
         © 2026 School ERP
       </div>
     </aside>
