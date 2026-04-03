@@ -37,6 +37,10 @@ export default function DefineFeeModal({fee, existingFees = [], academicYear, on
 
   const submit = async () => {
     if (!classId || !feeType || !amount || !dueDate) return;
+    if (!academicYearId) {
+      setError("No active academic year found. Please set up an academic year first.");
+      return;
+    }
 
     setSaving(true);
     setError("");
@@ -71,6 +75,12 @@ export default function DefineFeeModal({fee, existingFees = [], academicYear, on
         </div>
 
         {error && <div className="mx-6 mt-3 text-sm text-red-600 bg-red-50 p-3 rounded-lg">{error}</div>}
+
+        {!academicYearId && (
+          <div className="mx-6 mt-3 text-sm text-amber-700 bg-amber-50 p-3 rounded-lg">
+            No active academic year detected. Please create one in School Setup first.
+          </div>
+        )}
 
         {/* Form */}
         <div className="p-6 space-y-4">
