@@ -14,17 +14,9 @@ export default function DefineFeeModal({fee, existingFees = [], academicYear, on
 
   const [saving, setSaving] = useState(false);
   const [loadingClasses, setLoadingClasses] = useState(false);
+  const [error, setError] = useState("");
 
-  const duplicate = existingFees.some(f =>
-  f.classId === classId &&
-  f.feeType === feeType &&
-  f.id !== fee?.id
-);
-
-if (duplicate) {
-  alert("Fee already defined for this class and fee type");
-  return;
-}
+  // Duplicate check moved into submit handler
 
   // ✅ Load all classes
   useEffect(() => {
@@ -47,15 +39,18 @@ if (duplicate) {
     if (!classId || !feeType || !amount || !dueDate) return;
 
     setSaving(true);
+    setError("");
     try {
       await createFeeStructure({
-        academicYearId,
-        classId,
+        academicYearId: Number(academicYearId),
+        classId: Number(classId),
         feeType,
-        amount,
+        amount: parseFloat(amount),
         dueDate
       });
       onSave();
+    } catch (e) {
+      setError(e?.response?.data?.message || "Failed to create fee structure");
     } finally {
       setSaving(false);
     }
@@ -74,6 +69,8 @@ if (duplicate) {
         <div className="px-6 py-3 bg-blue-50 text-blue-700 text-sm">
           This fee will be defined for Academic Year <b>{academicYear}</b>
         </div>
+
+        {error && <div className="mx-6 mt-3 text-sm text-red-600 bg-red-50 p-3 rounded-lg">{error}</div>}
 
         {/* Form */}
         <div className="p-6 space-y-4">
@@ -111,12 +108,19 @@ if (duplicate) {
               className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm"
             >
               <option value="">Select Fee Type</option>
-              <option>TUITION</option>
-              <option>ADMISSION</option>
-              <option>EXAM</option>
-              <option>TRANSPORT</option>
-              <option>HOSTEL</option>
-              <option>MISC</option>
+              <option value="TUITION">Tuition</option>
+              <option value="ADMISSION">Admission</option>
+              <option value="EXAM">Exam</option>
+              <option value="TRANSPORT">Transport</option>
+              <option value="HOSTEL">Hostel</option>
+              <option value="LAB">Lab</option>
+              <option value="LIBRARY">Library</option>
+              <option value="SPORTS">Sports</option>
+              <option value="ANNUAL">Annual</option>
+              <option value="DEVELOPMENT">Development</option>
+              <option value="UNIFORM">Uniform</option>
+              <option value="BOOKS">Books</option>
+              <option value="MISC">Miscellaneous</option>
             </select>
           </div>
 
