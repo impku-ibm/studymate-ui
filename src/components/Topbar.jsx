@@ -3,16 +3,17 @@ import { logout } from "../utils/auth";
 
 export default function Topbar({ onMenuClick }) {
   const navigate = useNavigate();
-  const school = JSON.parse(localStorage.getItem("school") || "{}");
   const token = localStorage.getItem("token");
 
   let userName = "User";
   let userInitial = "U";
+  let userRole = "";
   try {
     if (token) {
       const payload = JSON.parse(atob(token.split(".")[1]));
       userName = payload.fullName || payload.email || payload.sub || "User";
       userInitial = userName.charAt(0).toUpperCase();
+      userRole = payload.role || "";
     }
   } catch { /* fallback */ }
 
@@ -22,38 +23,32 @@ export default function Topbar({ onMenuClick }) {
   };
 
   return (
-    <header className="h-14 sm:h-16 bg-white border-b border-slate-200 px-3 sm:px-6 flex items-center justify-between sticky top-0 z-20">
-
-      {/* Left: hamburger + title */}
+    <header className="h-14 bg-white border-b border-gray-200 px-4 sm:px-6 flex items-center justify-between sticky top-0 z-20">
       <div className="flex items-center gap-3">
-        <button onClick={onMenuClick} className="lg:hidden p-1.5 rounded-lg hover:bg-slate-100" data-testid="topbar-menu">
-          <svg className="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+        <button onClick={onMenuClick} className="lg:hidden p-1.5 rounded-lg hover:bg-gray-100 transition" data-testid="topbar-menu">
+          <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
           </svg>
         </button>
-        <h1 className="text-sm sm:text-lg font-semibold text-slate-900 truncate">
-          {school?.name || "Admin Panel"}
-        </h1>
       </div>
 
-      {/* Right: user + logout */}
-      <div className="flex items-center gap-2 sm:gap-4">
-        <div className="hidden sm:flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-lg">
-          <div className="h-7 w-7 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-semibold">
-            {userInitial}
+      <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5 cursor-default">
+          <div className="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center">
+            <span className="text-indigo-700 text-xs font-semibold">{userInitial}</span>
           </div>
-          <span className="text-sm text-slate-700 font-medium">{userName}</span>
+          <div className="hidden sm:block">
+            <p className="text-[13px] font-medium text-gray-900 leading-tight">{userName}</p>
+            {userRole && <p className="text-[11px] text-gray-400 leading-tight">{userRole}</p>}
+          </div>
         </div>
 
-        {/* Mobile: just initial */}
-        <div className="sm:hidden h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-semibold">
-          {userInitial}
-        </div>
+        <div className="h-5 w-px bg-gray-200 hidden sm:block" />
 
         <button onClick={handleLogout}
-          className="px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition"
+          className="text-[13px] text-gray-500 hover:text-gray-700 transition px-2 py-1 rounded-md hover:bg-gray-100"
           data-testid="topbar-logout">
-          Logout
+          Sign out
         </button>
       </div>
     </header>

@@ -15,34 +15,32 @@ export default function Students() {
 
   return (
     <div>
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold">Students</h2>
+      <div className="mb-5">
+        <h2 className="text-xl font-semibold text-gray-900">Students</h2>
+        <p className="text-sm text-gray-500 mt-0.5">Manage student records and enrollment</p>
       </div>
 
-      <div className="border-b mb-4 flex gap-6">
-        {tabs.map(tab => (
-          <button
-            key={tab.key}
-            onClick={() => tab.key === "promotion" ? setShowPromotion(true) : setActiveTab(tab.key)}
-            className={`pb-3 text-sm ${
-              activeTab === tab.key
-                ? "border-b-2 border-blue-600 text-blue-600 font-medium"
-                : "text-gray-500"
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
+      <div className="mb-5">
+        <div className="inline-flex bg-gray-100 rounded-lg p-1 gap-0.5">
+          {tabs.map(tab => (
+            <button key={tab.key}
+              onClick={() => tab.key === "promotion" ? setShowPromotion(true) : setActiveTab(tab.key)}
+              className={`px-4 py-1.5 text-[13px] font-medium rounded-md transition ${
+                activeTab === tab.key
+                  ? "bg-white text-gray-900 shadow-sm"
+                  : "text-gray-500 hover:text-gray-700"
+              }`}>
+              {tab.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {activeTab === "directory" && <StudentDirectory />}
       {activeTab === "enrollment" && <StudentEnrollment />}
 
       {showPromotion && (
-        <BulkPromotionModal
-          onClose={() => setShowPromotion(false)}
-          onSuccess={() => setShowPromotion(false)}
-        />
+        <BulkPromotionModal onClose={() => setShowPromotion(false)} onSuccess={() => setShowPromotion(false)} />
       )}
     </div>
   );

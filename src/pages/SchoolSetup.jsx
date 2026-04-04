@@ -20,29 +20,24 @@ export default function SchoolSetup() {
 
   return (
     <div>
-      <div className="mb-6">
-  <h2 className="text-3xl font-bold text-slate-900">
-    School Setup
-  </h2>
-  <p className="text-sm text-slate-500 mt-1">
-    Configure academic structure, classes, subjects and staff
-  </p>
-</div>
+      <div className="mb-5">
+        <h2 className="text-xl font-semibold text-gray-900">School Setup</h2>
+        <p className="text-sm text-gray-500 mt-0.5">Configure academic structure, classes, and subjects</p>
+      </div>
 
-      <div className="border-b flex gap-6 mb-6">
-        {tabs.map(t => (
-          <button
-            key={t.key}
-            onClick={() => setActiveTab(t.key)}
-            className={`pb-3 text-sm ${
-              activeTab === t.key
-                ? "border-b-2 border-blue-600 text-blue-600 font-medium"
-                : "text-gray-500"
-            }`}
-          >
-            {t.label}
-          </button>
-        ))}
+      <div className="mb-5 overflow-x-auto">
+        <div className="inline-flex bg-gray-100 rounded-lg p-1 gap-0.5">
+          {tabs.map(t => (
+            <button key={t.key} onClick={() => setActiveTab(t.key)}
+              className={`px-3.5 py-1.5 text-[13px] font-medium rounded-md transition whitespace-nowrap ${
+                activeTab === t.key
+                  ? "bg-white text-gray-900 shadow-sm"
+                  : "text-gray-500 hover:text-gray-700"
+              }`}>
+              {t.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {activeTab === "year" && <AcademicYearSetup />}
