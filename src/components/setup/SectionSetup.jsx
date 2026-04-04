@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../../api/axios";
 import AddSectionModal from "./AddSectionModal";
+import { TrashIcon } from "../common/Icons";
 
 export default function SectionSetup() {
   const [classes, setClasses] = useState([]);
@@ -110,6 +111,10 @@ export default function SectionSetup() {
                                tracking-wide text-slate-500">
                   Status
                 </th>
+                <th className="px-6 py-3 text-right text-xs uppercase
+                               tracking-wide text-slate-500">
+                  Actions
+                </th>
               </tr>
             </thead>
 
@@ -129,6 +134,21 @@ export default function SectionSetup() {
                                      bg-emerald-100 text-emerald-700">
                       ACTIVE
                     </span>
+                  </td>
+                  <td className="px-6 py-3 text-right">
+                    <button
+                      onClick={async () => {
+                        if (!confirm(`Delete section "${s.name}"?`)) return;
+                        try {
+                          await api.delete(`/sections/${s.id}`);
+                          api.get(`/classes/${selectedClass}/sections`).then(res => setSections(res.data));
+                        } catch (e) { alert(e?.response?.data?.message || "Cannot delete section"); }
+                      }}
+                      className="text-slate-400 hover:text-red-600 transition"
+                      title="Delete Section"
+                    >
+                      <TrashIcon className="w-[18px] h-[18px]" />
+                    </button>
                   </td>
                 </tr>
               ))}

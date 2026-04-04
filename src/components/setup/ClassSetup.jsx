@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../../api/axios";
 import AddClassModal from "./AddClassModal";
+import { TrashIcon } from "../common/Icons";
 
 export default function ClassSetup() {
   const [classes, setClasses] = useState([]);
@@ -72,6 +73,9 @@ export default function ClassSetup() {
                 <th className="px-6 py-3 text-left text-xs uppercase tracking-wide text-slate-500">
                   Status
                 </th>
+                <th className="px-6 py-3 text-right text-xs uppercase tracking-wide text-slate-500">
+                  Actions
+                </th>
               </tr>
             </thead>
 
@@ -90,6 +94,19 @@ export default function ClassSetup() {
                                      bg-emerald-100 text-emerald-700">
                       ACTIVE
                     </span>
+                  </td>
+                  <td className="px-6 py-3 text-right">
+                    <button
+                      onClick={async () => {
+                        if (!confirm(`Delete class "${c.name}"?`)) return;
+                        try { await api.delete(`/classes/${c.id}`); load(); }
+                        catch (e) { alert(e?.response?.data?.message || "Cannot delete — class may have students or sections"); }
+                      }}
+                      className="text-slate-400 hover:text-red-600 transition"
+                      title="Delete Class"
+                    >
+                      <TrashIcon className="w-[18px] h-[18px]" />
+                    </button>
                   </td>
                 </tr>
               ))}

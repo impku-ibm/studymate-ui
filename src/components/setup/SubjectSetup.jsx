@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../../api/axios";
 import AddSubjectModal from "./AddSubjectModal";
+import { TrashIcon } from "../common/Icons";
 
 export default function SubjectSetup() {
   const [subjects, setSubjects] = useState([]);
@@ -76,6 +77,9 @@ export default function SubjectSetup() {
                 <th className="px-6 py-3 text-left text-xs uppercase tracking-wide text-slate-500">
                   Status
                 </th>
+                <th className="px-6 py-3 text-right text-xs uppercase tracking-wide text-slate-500">
+                  Actions
+                </th>
               </tr>
             </thead>
 
@@ -98,6 +102,19 @@ export default function SubjectSetup() {
                                      bg-emerald-100 text-emerald-700">
                       ACTIVE
                     </span>
+                  </td>
+                  <td className="px-6 py-3 text-right">
+                    <button
+                      onClick={async () => {
+                        if (!confirm(`Delete subject "${s.name}"?`)) return;
+                        try { await api.delete(`/subjects/${s.id}`); load(); }
+                        catch (e) { alert(e?.response?.data?.message || "Cannot delete — subject may be assigned to classes"); }
+                      }}
+                      className="text-slate-400 hover:text-red-600 transition"
+                      title="Delete Subject"
+                    >
+                      <TrashIcon className="w-[18px] h-[18px]" />
+                    </button>
                   </td>
                 </tr>
               ))}
