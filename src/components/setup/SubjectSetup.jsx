@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import api from "../../api/axios";
 import AddSubjectModal from "./AddSubjectModal";
-import { TrashIcon } from "../common/Icons";
+import { PencilIcon, TrashIcon } from "../common/Icons";
 
 export default function SubjectSetup() {
   const [subjects, setSubjects] = useState([]);
   const [showAdd, setShowAdd] = useState(false);
+  const [editSubject, setEditSubject] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const load = async () => {
@@ -34,7 +35,7 @@ export default function SubjectSetup() {
         </div>
 
         <button
-          onClick={() => setShowAdd(true)}
+          onClick={() => { setEditSubject(null); setShowAdd(true); }}
           className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg
                      hover:bg-blue-500 transition shadow-sm"
         >
@@ -104,17 +105,26 @@ export default function SubjectSetup() {
                     </span>
                   </td>
                   <td className="px-6 py-3 text-right">
-                    <button
-                      onClick={async () => {
-                        if (!confirm(`Delete subject "${s.name}"?`)) return;
-                        try { await api.delete(`/subjects/${s.id}`); load(); }
-                        catch (e) { alert(e?.response?.data?.message || "Cannot delete — subject may be assigned to classes"); }
-                      }}
-                      className="text-slate-400 hover:text-red-600 transition"
-                      title="Delete Subject"
-                    >
-                      <TrashIcon className="w-[18px] h-[18px]" />
-                    </button>
+                    <div className="inline-flex items-center gap-3">
+                      <button
+                        onClick={() => { setEditSubject(s); setShowAdd(true); }}
+                        className="text-slate-400 hover:text-blue-600 transition"
+                        title="Edit Subject"
+                      >
+                        <PencilIcon className="w-[18px] h-[18px]" />
+                      </button>
+                      <button
+                        onClick={async () => {
+                          if (!confirm(`Delete subject "${s.name}"?`)) return;
+                          try { await api.delete(`/subjects/${s.id}`); load(); }
+                          catch (e) { alert(e?.response?.data?.message || "Cannot delete — subject may be assigned to classes"); }
+                        }}
+                        className="text-slate-400 hover:text-red-600 transition"
+                        title="Delete Subject"
+                      >
+                        <TrashIcon className="w-[18px] h-[18px]" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -127,9 +137,11 @@ export default function SubjectSetup() {
       {/* ---------- Modal ---------- */}
       {showAdd && (
         <AddSubjectModal
-          onClose={() => setShowAdd(false)}
+          subject={editSubject}
+          onClose={() => { setShowAdd(false); setEditSubject(null); }}
           onSuccess={() => {
             setShowAdd(false);
+            setEditSubject(null);
             load();
           }}
         />
