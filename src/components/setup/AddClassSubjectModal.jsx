@@ -20,9 +20,8 @@ export default function AddClassSubjectModal({
     setLoading(true);
     try {
       await api.post("/class-subjects", {
-        academicYearId: academicYear.id,
-        classId,
-        subjectId,
+        classId: Number(classId),
+        subjectIds: [Number(subjectId)],
       });
 
       onSuccess();
