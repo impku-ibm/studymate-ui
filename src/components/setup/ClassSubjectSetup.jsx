@@ -10,7 +10,33 @@ export default function ClassSubjectSetup() {
   const [classId, setClassId] = useState("");
   const [mappings, setMappings] = useState([]);
   const [showAdd, setShowAdd] = useState(false);
+  const [showCopy, setShowCopy] = useState(false);
+  const [copySourceId, setCopySourceId] = useState("");
+  const [copying, setCopying] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const reloadMappings = () => {
+    if (!classId || !academicYear) return;
+    setLoading(true);
+    api.get("/class-subjects", { params: { academicYearId: academicYear.id, classId } })
+      .then(res => setMappings(res.data))
+      .finally(() => setLoading(false));
+  };
+
+  const handleCopy = async () => {
+    if (!copySourceId || !classId) return;
+    setCopying(true);
+    try {
+      const res = await api.post(`/class-subjects/copy?sourceClassId=${copySourceId}&targetClassId=${classId}`);
+      const count = res.data?.length || 0;
+      setShowCopy(false);
+      setCopySourceId("");
+      reloadMappings();
+      if (count === 0) alert("No new subjects to copy — all subjects already mapped.");
+    } catch (e) {
+      alert(e?.response?.data?.message || "Failed to copy subjects");
+    } finally { setCopying(false); }
+  };
 
   // Load base data
   useEffect(() => {
@@ -33,21 +59,7 @@ export default function ClassSubjectSetup() {
 
   // Load mappings when class or year changes
   useEffect(() => {
-    if (!classId || !academicYear) {
-      setMappings([]);
-      return;
-    }
-
-    setLoading(true);
-    api
-      .get("/class-subjects", {
-        params: {
-          academicYearId: academicYear.id,
-          classId,
-        },
-      })
-      .then(res => setMappings(res.data))
-      .finally(() => setLoading(false));
+    reloadMappings();
   }, [classId, academicYear]);
 
   return (
@@ -95,6 +107,39 @@ export default function ClassSubjectSetup() {
           >
             + Add Subject
           </button>
+
+          <div className="relative">
+            <button
+              onClick={() => setShowCopy(!showCopy)}
+              disabled={!classId}
+              className="px-4 py-2 border border-slate-300 text-slate-700 text-sm
+                         rounded-lg hover:bg-slate-50 transition
+                         disabled:opacity-50"
+            >
+              Copy from Class
+            </button>
+
+            {showCopy && (
+              <div className="absolute right-0 top-full mt-2 bg-white border border-slate-200 rounded-xl shadow-lg p-4 z-20 w-72">
+                <p className="text-xs text-slate-500 mb-2">Copy all subjects from another class to the current one (skips duplicates)</p>
+                <select value={copySourceId} onChange={e => setCopySourceId(e.target.value)}
+                  className="w-full border border-slate-300 px-3 py-2 rounded-lg text-sm mb-3">
+                  <option value="">Select source class</option>
+                  {classes.filter(c => String(c.id) !== String(classId)).map(c => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
+                </select>
+                <div className="flex gap-2 justify-end">
+                  <button onClick={() => { setShowCopy(false); setCopySourceId(""); }}
+                    className="px-3 py-1.5 text-xs text-slate-600 border border-slate-300 rounded-lg">Cancel</button>
+                  <button onClick={handleCopy} disabled={!copySourceId || copying}
+                    className="px-3 py-1.5 text-xs bg-blue-600 text-white rounded-lg disabled:opacity-50">
+                    {copying ? "Copying..." : "Copy Subjects"}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -196,16 +241,7 @@ export default function ClassSubjectSetup() {
           onClose={() => setShowAdd(false)}
           onSuccess={() => {
             setShowAdd(false);
-            setLoading(true);
-            api
-              .get("/class-subjects", {
-                params: {
-                  academicYearId: academicYear.id,
-                  classId,
-                },
-              })
-              .then(res => setMappings(res.data))
-              .finally(() => setLoading(false));
+            reloadMappings();
           }}
         />
       )}
