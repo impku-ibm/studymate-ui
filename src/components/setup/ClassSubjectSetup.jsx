@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../../api/axios";
 import AddClassSubjectModal from "./AddClassSubjectModal";
+import { TrashIcon } from "../common/Icons";
 
 export default function ClassSubjectSetup() {
   const [academicYear, setAcademicYear] = useState(null);
@@ -135,6 +136,10 @@ export default function ClassSubjectSetup() {
                                tracking-wide text-slate-500">
                   Status
                 </th>
+                <th className="px-6 py-3 text-right text-xs uppercase
+                               tracking-wide text-slate-500">
+                  Actions
+                </th>
               </tr>
             </thead>
 
@@ -146,11 +151,11 @@ export default function ClassSubjectSetup() {
                              hover:bg-slate-50 transition"
                 >
                   <td className="px-6 py-4 font-medium text-slate-800">
-                    {m.subject.name}
+                    {m.subjectName || m.subject?.name}
                   </td>
 
                   <td className="px-6 py-4 text-slate-600">
-                    {m.subject.code}
+                    {m.subjectCode || m.subject?.code}
                   </td>
 
                   <td className="px-6 py-4">
@@ -158,6 +163,21 @@ export default function ClassSubjectSetup() {
                                      bg-emerald-100 text-emerald-700">
                       ACTIVE
                     </span>
+                  </td>
+                  <td className="px-6 py-4 text-right">
+                    <button
+                      onClick={async () => {
+                        if (!confirm(`Remove "${m.subjectName || m.subject?.name}" from this class?`)) return;
+                        try {
+                          await api.delete(`/class-subjects/${m.id}`);
+                          setMappings(prev => prev.filter(x => x.id !== m.id));
+                        } catch (e) { alert(e?.response?.data?.message || "Failed to remove mapping"); }
+                      }}
+                      className="text-slate-400 hover:text-red-600 transition"
+                      title="Remove Subject"
+                    >
+                      <TrashIcon className="w-[18px] h-[18px]" />
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -172,6 +192,7 @@ export default function ClassSubjectSetup() {
           academicYear={academicYear}
           classId={classId}
           subjects={subjects}
+          existingMappings={mappings}
           onClose={() => setShowAdd(false)}
           onSuccess={() => {
             setShowAdd(false);
